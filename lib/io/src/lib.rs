@@ -1,7 +1,7 @@
 
-pub mod logger {
+pub mod io {
     #[warn(dead_code)]
-    pub fn debug(message: &str) {
+    pub fn output(message: &str) {
         println!("{}", message);
     }
 }
@@ -11,7 +11,7 @@ pub mod logger {
 mod tests {
 
     #[test]
-    fn test_debug() {
+    fn test_output() {
         assert_eq!(3, 3);
     }
 }

@@ -38,9 +38,26 @@ echo "SRC=${SRC}"
 echo "LIBS=${LIBS[@]}"
 echo "VERBOSE=${VERBOSE}"
 
-for f in "a.rs" "b.rs" "c.rs"
+echo "" > main.rs
+
+for LIB in ${LIBS[@]}
 do
-    echo "mod ${f%.*} {" >> main.rs
-    cat "$f" >> main.rs
-    echo "}" >> main.rs
+    cat ./lib/$LIB/src/*.rs >> main.rs
 done
+
+cat "${SRC}" >> main.rs
+
+for LIB in ${LIBS[@]}
+do
+    sed -i "s|use $LIB::$LIB.*||" main.rs
+done
+
+
+perl -i -0pe 's|^#\[cfg\(test\)\].*?^}||gms' main.rs
+
+perl -i -0pe 's|\n\n|\n|gms' main.rs
+perl -i -0pe 's|\n\n|\n|gms' main.rs
+perl -i -0pe 's|\n\n|\n|gms' main.rs
+
+
+
