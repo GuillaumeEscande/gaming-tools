@@ -1,5 +1,5 @@
 [package]
-name = "io"
+name = "gamio"
 version = "0.1.0"
 authors = ["Guillaume Escande <escande.guillaume@gmail.com>"]
 edition = "2018"

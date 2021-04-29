@@ -1,22 +1,18 @@
 #!/bin/bash
 
 usage(){
-    echo "usage"
+    echo "merger.sh [-l <lib project name>]* [-o <file output path>] <src roject name>"
 }
 
-OUTPUT=""
+OUTPUT="main.rs"
 LIBS=()
-VERBOSE=false
 
 
-while getopts ":o:l:hv" option; do
+while getopts ":o:l:h" option; do
     case "${option}" in
         h)
             usage
             exit 1
-            ;;
-        v)
-            VERBOSE=true
             ;;
         o)
             OUTPUT="${OPTARG}"
@@ -36,28 +32,27 @@ SRC="$@"
 echo "OUTPUT=${OUTPUT}"
 echo "SRC=${SRC}"
 echo "LIBS=${LIBS[@]}"
-echo "VERBOSE=${VERBOSE}"
 
-echo "" > main.rs
-
-for LIB in ${LIBS[@]}
-do
-    cat ./lib/$LIB/src/*.rs >> main.rs
-done
-
-cat "${SRC}" >> main.rs
+echo "" > "${OUTPUT}"
 
 for LIB in ${LIBS[@]}
 do
-    sed -i "s|use $LIB::$LIB.*||" main.rs
+    cat ./lib/$LIB/src/*.rs >> "${OUTPUT}"
+done
+
+cat ./src/${SRC}/src/*.rs >> "${OUTPUT}"
+
+for LIB in ${LIBS[@]}
+do
+    sed -i "s|use $LIB::$LIB.*||" "${OUTPUT}"
 done
 
 
-perl -i -0pe 's|^#\[cfg\(test\)\].*?^}||gms' main.rs
+perl -i -0pe 's|^#\[cfg\(test\)\].*?^}||gms' "${OUTPUT}"
 
-perl -i -0pe 's|\n\n|\n|gms' main.rs
-perl -i -0pe 's|\n\n|\n|gms' main.rs
-perl -i -0pe 's|\n\n|\n|gms' main.rs
+perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT}"
+perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT}"
+perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT}"
 
 
 
