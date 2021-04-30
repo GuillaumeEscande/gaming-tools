@@ -1,0 +1,22 @@
+Type d'algo :
+
+- If This then that
+
+- MiniMax, alpha-beta pluning => Jeux de plateau
+
+- Meta-heuristic
+  - Recherche complexe : DFS, BFS, A*
+  - Recherche tronquées : BeamSearch, MCTS
+  - Recherche aléatoire : Monté-carlo, algo génétique, PSO, recuit simulé
+  
+
+A faire  :   A* - Monté-carlo - MiniMax
+  
+  
+Libs :
+
+StateManager -> sauvegardé les états précédents du jeux + comparaison
+
+TimeWatcher -> Lib dans laquelle pousser des résultats temporaire et qui triggre un action de dernière second si timeout approche
+
+TestReader -> Lib pour les tests qui permet de lire une arbo de fichier avec les stdin et stdout pour vérifier l'intégration
