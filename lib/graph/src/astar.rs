@@ -1,16 +1,41 @@
-// Graph module with implementation Graph search algorithms
+// Graph module with implementation Graph seaRCh algorithms
 pub mod graph {
-    use std::collections::LinkedList;
+    use std::vec::Vec;
+    use std::rc::Rc;
     use crate::model;
 
-    // Research shortesd path on the graph between start and target
+    // ReseaRCh shortesd path on the graph between start and target
 
     pub fn resolve_astar(
-        graph: Box<dyn model::graph::Graph>,
-        start: Box<dyn model::graph::Node>,
-        target: Box<dyn model::graph::Node> ) -> LinkedList<Box<dyn model::graph::Node>> {
+        graph: Rc<dyn model::graph::Graph>,
+        start: Rc<dyn model::graph::Node>,
+        target: Rc<dyn model::graph::Node> ) -> Vec<Rc<dyn model::graph::Node>> {
+        use std::collections::HashMap;
+        
+        let mut targeted_nodes : HashMap<Rc<dyn model::graph::Node>, f64> = HashMap::new();
 
-        let best_way = LinkedList::new();
+        targeted_nodes.insert(start, 0.0);
+
+        while ! targeted_nodes.contains_key(target) {
+
+            for (node, cost) in &targeted_nodes {
+                for (next_node, link) in node.nexts() {
+                    let new_cost = cost + link.cost();
+                    if targeted_nodes.contains_key(next_node) {
+                        let old_cost = targeted_nodes.get(next_node);
+                        if new_cost < old_cost {
+                            targeted_nodes.insert(next_node, new_cost);
+                        }
+                    } else {
+                        targeted_nodes.insert(next_node, new_cost);
+                    }
+                }
+            }
+
+        }
+        //
+        //
+        let best_way = Vec::new();
         return best_way;
     }
 
@@ -19,7 +44,8 @@ pub mod graph {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::LinkedList;
+    use std::collections::HashMap;
+    use std::rc::Rc;
     use crate::model;
     use crate::model::graph::default;
     use super::*;
@@ -27,32 +53,25 @@ mod tests {
     #[test]
     fn test_nominal() {
 
-        let mut nodes : LinkedList< Box<dyn model::graph::Node> > = LinkedList::new();
-        let mut links : LinkedList< Box<dyn model::graph::Link> > = LinkedList::new();
 
-        let node1 = Box::<default::DefaultNode>::new(default::DefaultNode{
-            name: String::from("test"), nexts: LinkedList::new()});
-        let link1 = Box::<default::DefaultLink>::new(default::DefaultLink{
-            cost: 2.5});
-        let node2 = Box::<default::DefaultNode>::new(default::DefaultNode{
-            name: String::from("test2"), nexts: LinkedList::new()});
+        let node2 = Rc::<default::DefaultNode>::new(default::DefaultNode{ name: String::from("node2"), nexts: HashMap::new()});
+        let link1 = Rc::<default::DefaultLink>::new(default::DefaultLink{ cost: 2.5});
+        let node1_next : HashMap< Rc<dyn model::graph::Node>, Rc<dyn model::graph::Link> > = HashMap::new();
+        node1_next.insert(node2, link1);
+        let node1 = Rc::<default::DefaultNode>::new(default::DefaultNode{ name: String::from("node1"), nexts: node1_next});
 
-        node1.nexts.push_back((link1, node2));
+        let nodes : Vec< Rc<dyn model::graph::Node> > = vec![node1.clone(), node2.clone()];
+        let links : Vec< Rc<dyn model::graph::Link> > = vec![link1.clone()];
 
-        nodes.push_back(node1);
-        nodes.push_back(node1);
-
-        links.push_back(link1);
-
-        let grah = Box::<default::DefaultGraph>::new(default::DefaultGraph{
+        let grah = Rc::<default::DefaultGraph>::new(default::DefaultGraph{
             nodes: nodes,
             links: links});
 
 
-        let result : LinkedList::<Box::<dyn model::graph::Node>> = graph::resolve_astar(
+        let result : Vec::< Rc<dyn model::graph::Node> > = graph::resolve_astar(
             grah,
-            node1,
-            node2 );
+            node1.clone(),
+            node2.clone() );
 
         assert!(result.len() == 0);
     }

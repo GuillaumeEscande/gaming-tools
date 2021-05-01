@@ -1,9 +1,10 @@
 pub mod graph {
-    use std::collections::LinkedList;   
+    use std::collections::HashMap;
+    use std::rc::Rc;
 
     pub trait Node {
-        fn name(self) -> String;
-        fn next(self) -> LinkedList< (Box<dyn Link>, Box<dyn Node>) >;
+        fn get_name(self) -> String;
+        fn nexts(self) -> HashMap< Rc<dyn Node>, Rc<dyn Link> >;
     }
     
     pub trait Link {
@@ -11,13 +12,14 @@ pub mod graph {
     }
     
     pub trait Graph {
-        fn nodes(self) -> LinkedList< Box<dyn Node> >;
-        fn links(self) -> LinkedList< Box<dyn Link> >;
+        fn nodes(self) -> Vec< Rc<dyn Node> >;
+        fn links(self) -> Vec< Rc<dyn Link> >;
     }
  
     
     pub mod default {
-        use std::collections::LinkedList; 
+        use std::collections::HashMap; 
+        use std::rc::Rc;
         use crate::model; 
 
         pub struct DefaultLink {
@@ -29,33 +31,46 @@ pub mod graph {
                 return self.cost;
             }
         }
-    
+
         pub struct DefaultNode {
             pub name: String,
-            pub nexts: LinkedList::< (Box<dyn model::graph::Link>, Box<dyn model::graph::Node>) >
+            pub nexts: HashMap< Rc<dyn model::graph::Node>, Rc<dyn model::graph::Link> >
         }
     
         impl model::graph::Node for DefaultNode {
-            fn name(self) -> String{
+            fn get_name(self) -> String{
                 return self.name;
             }
-            fn next(self) -> LinkedList< (Box<dyn model::graph::Link>, Box<dyn model::graph::Node>) >{
+            fn nexts(self) -> HashMap< Rc<dyn model::graph::Node>, Rc<dyn model::graph::Link> > {
                 return self.nexts;
             }
         }
 
+        impl std::hash::Hash for DefaultNode {
+            fn hash<H: std::hash::Hasher>(&self, state: &mut H) {
+                self.name.hash(state);
+            }
+        }
+
+        impl PartialEq for DefaultNode {
+            fn eq(&self, other: &DefaultNode) -> bool {
+                self.name == other.name
+            }
+        }
+
+
         pub struct DefaultGraph {
-            pub nodes: LinkedList< Box<dyn model::graph::Node> >,
-            pub links: LinkedList< Box<dyn model::graph::Link> >
+            pub nodes: Vec< Rc<dyn model::graph::Node> >,
+            pub links: Vec< Rc<dyn model::graph::Link> >
         }
 
         impl model::graph::Graph for DefaultGraph {
 
-            fn nodes(self) -> LinkedList< Box<dyn model::graph::Node> >{
+            fn nodes(self) -> Vec< Rc<dyn model::graph::Node> >{
                 return self.nodes;
             }
 
-            fn links(self) -> LinkedList< Box<dyn model::graph::Link> >{
+            fn links(self) -> Vec< Rc<dyn model::graph::Link> >{
                 return self.links;
             }
         }
