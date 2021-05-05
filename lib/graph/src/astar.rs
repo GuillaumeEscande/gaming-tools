@@ -11,9 +11,8 @@ pub mod graph {
     pub fn resolve_astar< T : graph::Nodeable + Clone + Debug>(
         start: &T,
         target: &T ) -> LinkedList<T> {
-        use std::collections::LinkedList;
         
-        let mut targeted_nodes : LinkedList< graph::Way<T> > = LinkedList::new();
+        let mut targeted_nodes : Vec< graph::Way<T> > = Vec::new();
         let mut fisrt_way_ls : LinkedList<T> = LinkedList::new();
         let initial_distance = start.distance(target);
         fisrt_way_ls.push_back(start.clone());
@@ -22,14 +21,15 @@ pub mod graph {
             distance: initial_distance
         };
 
-        targeted_nodes.push_back(first_way);
+        targeted_nodes.push(first_way);
 
         // While target of the best way 
-        while targeted_nodes.len() > 0 && targeted_nodes.front().unwrap().nodes.back().unwrap() != target {
+        while targeted_nodes.len() > 0 && targeted_nodes.last().unwrap().nodes.back().unwrap() != target {
 
-            let better_way : graph::Way<T> = targeted_nodes.pop_front().unwrap();
+            let better_way : graph::Way<T> = targeted_nodes.pop().unwrap();
 
             let next_nodes : Vec< T > = better_way.nodes.back().unwrap().nexts();
+
 
             for next_node in next_nodes {
                 let mut new_nodes_path = better_way.nodes.clone();
@@ -39,17 +39,17 @@ pub mod graph {
                     nodes: new_nodes_path,
                     distance: new_distance
                 };
-                targeted_nodes.push_back(new_way);
+                targeted_nodes.push(new_way);
             }
+            
+            use std::cmp::Reverse;
+            targeted_nodes.sort_by_cached_key(|k|  Reverse(k.distance));
 
-            let mut vec: Vec<_> = targeted_nodes.into_iter().collect();
-            vec.sort_unstable_by_key(|k| k.distance);
-            targeted_nodes = vec.into_iter().collect();
 
 
         }
         if targeted_nodes.len() > 0{
-            return targeted_nodes.pop_front().unwrap().nodes;
+            return targeted_nodes.pop().unwrap().nodes;
         }
         else {
             return LinkedList::new();
@@ -128,8 +128,8 @@ mod tests {
         let origin: BoardCase = BoardCase{
             x: 0,
             y: 0,
-            x_size: 10,
-            y_size: 10,
+            x_size: 100,
+            y_size: 100,
         };
 
         let target: BoardCase = BoardCase{
