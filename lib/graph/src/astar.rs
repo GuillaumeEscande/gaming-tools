@@ -1,26 +1,31 @@
 // Graph module with implementation Graph seaRCh algorithms
 pub mod graph {
     use std::vec::Vec;
-    use std::rc::Rc;
-    use crate::model;
+    use crate::model::graph;
+    use std::collections::LinkedList;
 
     // ReseaRCh shortesd path on the graph between start and target
 
-    pub fn resolve_astar(
-        graph: Rc<dyn model::graph::Graph>,
-        start: Rc<dyn model::graph::Node>,
-        target: Rc<dyn model::graph::Node> ) -> Vec<Rc<dyn model::graph::Node>> {
-        use std::collections::HashMap;
+    pub fn resolve_astar< T : graph::Nodeable>(
+        start: T,
+        target: &T ) -> LinkedList<T> {
+        use std::collections::LinkedList;
         
-        let mut targeted_nodes : HashMap<Rc<dyn model::graph::Node>, f64> = HashMap::new();
+        let mut targeted_nodes : LinkedList< graph::Way<T> > = LinkedList::new();
+        let mut fisrt_way_ls : LinkedList<T> = LinkedList::new();
+        fisrt_way_ls.push_back(start);
+        let first_way = graph::Way(
+            nodes: fisrt_way_ls
+        );
 
-        targeted_nodes.insert(start, 0.0);
+        targeted_nodes.push_back(first_way);
 
-        while ! targeted_nodes.contains_key(target) {
-
+        // While target of the best way 
+        while ! targeted_nodes.front().unwrap().nodes.back().unwrap() == target {
+/*
             for (node, cost) in &targeted_nodes {
-                for (next_node, link) in node.nexts() {
-                    let new_cost = cost + link.cost();
+                for (next_node, next_cost) in node.nexts() {
+                    let new_cost = cost + next_cost;
                     if targeted_nodes.contains_key(next_node) {
                         let old_cost = targeted_nodes.get(next_node);
                         if new_cost < old_cost {
@@ -31,6 +36,7 @@ pub mod graph {
                     }
                 }
             }
+            */
 
         }
         //
@@ -47,13 +53,12 @@ mod tests {
     use std::collections::HashMap;
     use std::rc::Rc;
     use crate::model;
-    use crate::model::graph::default;
     use super::*;
 
     #[test]
     fn test_nominal() {
 
-
+/*
         let node2 = Rc::<default::DefaultNode>::new(default::DefaultNode{ name: String::from("node2"), nexts: HashMap::new()});
         let link1 = Rc::<default::DefaultLink>::new(default::DefaultLink{ cost: 2.5});
         let node1_next : HashMap< Rc<dyn model::graph::Node>, Rc<dyn model::graph::Link> > = HashMap::new();
@@ -74,5 +79,6 @@ mod tests {
             node2.clone() );
 
         assert!(result.len() == 0);
+*/
     }
 }
