@@ -3,7 +3,11 @@ all: test merge
 
 test: test_libs test_src
 
-test_libs: test_solver test_graph test_gamio test_logger
+test_libs: test_base test_solver test_graph test_gamio test_logger
+
+test_base: 
+	cd lib/base && \
+	cargo test
 
 test_graph: 
 	cd lib/graph && \
