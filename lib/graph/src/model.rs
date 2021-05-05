@@ -3,15 +3,15 @@ pub mod graph {
     use std::hash::Hash;
 
     pub trait Nodeable : Eq + PartialEq + Sized + Hash {
-        fn nexts(&self) -> LinkedList< Self >;
-        fn distance(&self, &Self) -> i64;
+        fn nexts(&self) -> Vec< Self >;
+        fn distance(&self, target: &Self) -> i64;
     }
     
 
-    #[derive(Hash, Clone)]
+    #[derive(Hash, Clone, Debug)]
     pub struct Way< T : Nodeable >{
-        nodes : LinkedList< T >,
-        distance: i64,
+        pub nodes : LinkedList< T >,
+        pub distance: i64,
     }
     
 }

@@ -3,46 +3,57 @@ pub mod graph {
     use std::vec::Vec;
     use crate::model::graph;
     use std::collections::LinkedList;
+    use std::fmt::Debug;
+
 
     // ReseaRCh shortesd path on the graph between start and target
 
-    pub fn resolve_astar< T : graph::Nodeable>(
-        start: T,
+    pub fn resolve_astar< T : graph::Nodeable + Clone + Debug>(
+        start: &T,
         target: &T ) -> LinkedList<T> {
         use std::collections::LinkedList;
         
         let mut targeted_nodes : LinkedList< graph::Way<T> > = LinkedList::new();
         let mut fisrt_way_ls : LinkedList<T> = LinkedList::new();
-        fisrt_way_ls.push_back(start);
-        let first_way = graph::Way(
-            nodes: fisrt_way_ls
-        );
+        let initial_distance = start.distance(target);
+        fisrt_way_ls.push_back(start.clone());
+        let first_way : graph::Way<T> = graph::Way{
+            nodes: fisrt_way_ls,
+            distance: initial_distance
+        };
 
         targeted_nodes.push_back(first_way);
 
         // While target of the best way 
-        while ! targeted_nodes.front().unwrap().nodes.back().unwrap() == target {
-/*
-            for (node, cost) in &targeted_nodes {
-                for (next_node, next_cost) in node.nexts() {
-                    let new_cost = cost + next_cost;
-                    if targeted_nodes.contains_key(next_node) {
-                        let old_cost = targeted_nodes.get(next_node);
-                        if new_cost < old_cost {
-                            targeted_nodes.insert(next_node, new_cost);
-                        }
-                    } else {
-                        targeted_nodes.insert(next_node, new_cost);
-                    }
-                }
+        while targeted_nodes.len() > 0 && targeted_nodes.front().unwrap().nodes.back().unwrap() != target {
+
+            let better_way : graph::Way<T> = targeted_nodes.pop_front().unwrap();
+
+            let next_nodes : Vec< T > = better_way.nodes.back().unwrap().nexts();
+
+            for next_node in next_nodes {
+                let mut new_nodes_path = better_way.nodes.clone();
+                let new_distance = next_node.distance(target);
+                new_nodes_path.push_back(next_node);
+                let new_way : graph::Way<T> = graph::Way{
+                    nodes: new_nodes_path,
+                    distance: new_distance
+                };
+                targeted_nodes.push_back(new_way);
             }
-            */
+
+            let mut vec: Vec<_> = targeted_nodes.into_iter().collect();
+            vec.sort_unstable_by_key(|k| k.distance);
+            targeted_nodes = vec.into_iter().collect();
+
 
         }
-        //
-        //
-        let best_way = Vec::new();
-        return best_way;
+        if targeted_nodes.len() > 0{
+            return targeted_nodes.pop_front().unwrap().nodes;
+        }
+        else {
+            return LinkedList::new();
+        }
     }
 
 }
@@ -50,35 +61,87 @@ pub mod graph {
 
 #[cfg(test)]
 mod tests {
-    use std::collections::HashMap;
-    use std::rc::Rc;
-    use crate::model;
-    use super::*;
+    use crate::model::graph;
+    use crate::astar::graph::*;
+    use std::collections::LinkedList;
 
     #[test]
     fn test_nominal() {
 
-/*
-        let node2 = Rc::<default::DefaultNode>::new(default::DefaultNode{ name: String::from("node2"), nexts: HashMap::new()});
-        let link1 = Rc::<default::DefaultLink>::new(default::DefaultLink{ cost: 2.5});
-        let node1_next : HashMap< Rc<dyn model::graph::Node>, Rc<dyn model::graph::Link> > = HashMap::new();
-        node1_next.insert(node2, link1);
-        let node1 = Rc::<default::DefaultNode>::new(default::DefaultNode{ name: String::from("node1"), nexts: node1_next});
+        #[derive(Hash, Clone, Eq, PartialEq, Debug)]
+        pub struct BoardCase{
+            pub x : i64,
+            pub y : i64,
+            pub x_size : i64,
+            pub y_size : i64,
+        }
 
-        let nodes : Vec< Rc<dyn model::graph::Node> > = vec![node1.clone(), node2.clone()];
-        let links : Vec< Rc<dyn model::graph::Link> > = vec![link1.clone()];
+        impl graph::Nodeable for BoardCase {
+            fn nexts(&self) -> Vec< Self >{
+                let mut nexts : Vec<BoardCase> = Vec::new();
 
-        let grah = Rc::<default::DefaultGraph>::new(default::DefaultGraph{
-            nodes: nodes,
-            links: links});
+                if self.x > 1  {
+                    nexts.push(BoardCase{
+                        x: self.x - 1,
+                        y: self.y,
+                        x_size: self.x_size,
+                        y_size: self.y_size
+                    });
+                };
+                if self.x < (self.x_size - 1) {
+                    nexts.push(BoardCase{
+                        x: self.x + 1,
+                        y: self.y,
+                        x_size: self.x_size,
+                        y_size: self.y_size
+                    });
+                };
+                if self.y > 1  {
+                    nexts.push(BoardCase{
+                        x: self.x,
+                        y: self.y - 1,
+                        x_size: self.x_size,
+                        y_size: self.y_size
+                    });
+                };
+                if self.y < (self.y_size - 1) {
+                    nexts.push(BoardCase{
+                        x: self.x,
+                        y: self.y + 1,
+                        x_size: self.x_size,
+                        y_size: self.y_size
+                    });
+                };
+                return nexts;
+            }
+            fn distance(&self, target: &BoardCase) -> i64{
+                let a_x = self.x as f64;
+                let a_y = self.y as f64;
+                let b_x = target.x as f64;
+                let b_y = target.y as f64;
+                let distance = ( ( (b_x - a_x).powi(2) + (b_y - a_y).powi(2) ).sqrt() * 10.0 ) as i64;
 
+                return distance;
+            }
+        }
 
-        let result : Vec::< Rc<dyn model::graph::Node> > = graph::resolve_astar(
-            grah,
-            node1.clone(),
-            node2.clone() );
+        let origin: BoardCase = BoardCase{
+            x: 0,
+            y: 0,
+            x_size: 10,
+            y_size: 10,
+        };
 
-        assert!(result.len() == 0);
-*/
+        let target: BoardCase = BoardCase{
+            x: 9,
+            y: 9,
+            x_size: 10,
+            y_size: 10,
+        };
+
+        let best_way : LinkedList<BoardCase> = resolve_astar::<BoardCase>( &origin, &target );
+
+        assert_eq!(best_way.len(), 19);
+        
     }
 }
