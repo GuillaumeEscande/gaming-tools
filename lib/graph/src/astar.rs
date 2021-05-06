@@ -41,7 +41,7 @@ pub mod graph {
                 };
                 targeted_nodes.push(new_way);
             }
-            
+
             use std::cmp::Reverse;
             targeted_nodes.sort_by_cached_key(|k|  Reverse(k.distance));
 
@@ -128,8 +128,8 @@ mod tests {
         let origin: BoardCase = BoardCase{
             x: 0,
             y: 0,
-            x_size: 100,
-            y_size: 100,
+            x_size: 10,
+            y_size: 10,
         };
 
         let target: BoardCase = BoardCase{
