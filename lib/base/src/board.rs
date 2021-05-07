@@ -111,21 +111,10 @@ pub mod base {
                 &self.board[pos[0]][pos[1]][pos[2]]
             }
             fn print(&self){
-
-                for x in 0..self.size{
-                    for y in 0..self.size{
-                        
-                    }
-                    eprintln!()
-                }
-                
+                //TODO
             }
         }
     }
-
-
-
-
 }
 
 
@@ -142,9 +131,10 @@ mod tests {
         assert_eq!(board.neighbors( board.get( &vec!(3 as usize, 3 as usize, 3 as usize) ) ).len(), 6);
         assert_eq!(board.neighbors( board.get( &vec!(0 as usize, 0 as usize, 0 as usize) ) ).len(), 3);
 
-
         assert_eq!(board.distance( board.get( &vec!(0 as usize, 0 as usize, 0 as usize) ), board.get( &vec!(0 as usize, 0 as usize, 0 as usize) ) ), 0);
         assert_eq!(board.distance( board.get( &vec!(0 as usize, 0 as usize, 0 as usize) ), board.get( &vec!(1 as usize, 0 as usize, 0 as usize) ) ), 1);
+        assert_eq!(board.distance( board.get( &vec!(0 as usize, 0 as usize, 0 as usize) ), board.get( &vec!(0 as usize, 3 as usize, 0 as usize) ) ), 3);
+        assert_eq!(board.distance( board.get( &vec!(0 as usize, 0 as usize, 0 as usize) ), board.get( &vec!(1 as usize, 2 as usize, 1 as usize) ) ), 2);
 
     }
 }   
