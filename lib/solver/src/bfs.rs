@@ -1,86 +1,83 @@
 // Graph module with implementation Graph Search algorithms
 pub mod solver {
-    use std::collections::HashMap;
+    use std::collections::{HashMap, VecDeque};
     use std::hash::Hash;
+    use std::rc::Rc;
+
     use model::solver::*;
+
     use crate::model;
 
-    // Research shortesd path on the graph between start and target
+// Research shortest path on the graph between start and target
 
-    pub fn breadth_first_search< T : Solvable + Eq + PartialEq + Hash>(
-        initial: T,
-        max_deep: i32 ) -> HashMap<T, i64> {
-        use std::collections::LinkedList;
+    pub fn breadth_first_search<T: Solvable + Eq + PartialEq + Hash>(
+        init_state: Rc<T>,
+        max_depth: i32) -> HashMap<Rc<T>, i64> {
+        eprintln!("start of bfs, max deep {}", max_depth);
 
-        let mut listed_states : HashMap<T, i64> = HashMap::new();
+        let mut listed_states: HashMap<Rc<T>, i64> = HashMap::new();
+        let mut queue: VecDeque<Rc<T>> = VecDeque::new();
+        queue.push_back(init_state);
 
-        let mut to_test_states : LinkedList<T> = LinkedList::new();
+        let mut depth: i32 = 0;
 
-        to_test_states.push_back(initial);
+        while !queue.is_empty() && depth < max_depth {
+            let current = queue.pop_back().expect("WTF la queue est vide !");
 
-        let deep_count : i32 = 0;
-
-        while deep_count < max_deep && to_test_states.len() > 0 {
-
-            let mut next_floor_states : LinkedList<T> = LinkedList::new();
-
-            for node in to_test_states {
-                let value: i64 = node.value();
-                let mut next_state = node.next_states();
-
-                listed_states.insert(node, value);
-                next_floor_states.append(&mut next_state);
+            for next_state in &current.next_states()
+            {
+                if !listed_states.contains_key(next_state) {
+                    queue.push_back(next_state.clone());
+                    listed_states.insert(next_state.clone(), next_state.value());
+                }
             }
-
-            to_test_states = next_floor_states;
-            deep_count++;
-
+            depth += 1;
         }
 
         return listed_states;
     }
-
 }
 
 
 #[cfg(test)]
 mod tests {
-    use std::collections::LinkedList;
     use std::collections::HashMap;
+    use std::collections::LinkedList;
+    use std::rc::Rc;
+
     use crate::model::solver::*;
+
     use super::*;
 
+    #[derive(Eq, PartialEq, Hash, Clone)]
+    struct DefaultSolvable {
+        value: i64,
+        next_states: LinkedList<Rc<Self>>,
+    }
+
+    impl Solvable for DefaultSolvable {
+        fn value(&self) -> i64 {
+            return self.value;
+        }
+        fn next_states(&self) -> LinkedList<Rc<Self>> {
+            return self.next_states.iter().map(|state| state.clone()).collect();
+        }
+    }
+
     #[test]
-    fn test_bdf() {
+    fn test_bfs() {
+        let node2 = Rc::new(DefaultSolvable { value: 9, next_states: LinkedList::<Rc<DefaultSolvable>>::new() });
+        let mut next1 = LinkedList::<Rc<DefaultSolvable>>::new();
+        next1.push_back(node2.clone());
+        let node1 = Rc::new(DefaultSolvable { value: 15, next_states: next1 });
 
-        #[derive(Eq,PartialEq,Hash,Clone)]
-        struct DefaultSolvable {
-            value: i64,
-            next_states: LinkedList< Self >
-        }
+        let result: HashMap<Rc<DefaultSolvable>, i64> = solver::breadth_first_search(node1.clone(), 0);
+        assert_eq!(result.len(), 0);
 
-        impl Solvable for DefaultSolvable {
-            fn value(&self)->i64{
-                return self.value;
-            }
-            fn next_states(&self)->LinkedList< Self >{
-                return self.next_states.clone();
-            }
-        }
+        let result: HashMap::<Rc<DefaultSolvable>, i64> = solver::breadth_first_search(node1.clone(), 1);
+        assert_eq!(result.len(), 1);
 
-        let node2 = DefaultSolvable{ value: 9, next_states: LinkedList::<DefaultSolvable>::new() };
-        let mut next1 = LinkedList::<DefaultSolvable>::new();
-        next1.push_back(node2);
-        let node1 = DefaultSolvable{ value: 15, next_states: next1 };
-
-
-        let result : HashMap::<DefaultSolvable, i64> = solver::breadth_first_search( node1, 0 );
-        assert!(result.len() == 0);
-        *
-        let result : HashMap::<DefaultSolvable, i64> = solver::breadth_first_search( node1, 1 );
-        assert!(result.len() == 1);
-
-        let result : HashMap::<DefaultSolvable, i64> = solver::breadth_first_search( node1, 2 );
-        assert!(result.len() == 1);
+        let result: HashMap::<Rc<DefaultSolvable>, i64> = solver::breadth_first_search(node1.clone(), 2);
+        assert_eq!(result.len(), 1);
     }
 }
