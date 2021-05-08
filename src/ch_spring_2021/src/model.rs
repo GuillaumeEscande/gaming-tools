@@ -7,12 +7,21 @@ pub enum Action {
     COMPLETE(i8),
 }
 
+impl Action {
+    pub fn print(&self) {
+        match self
+        {
+            Action::WAIT(message) => println!("WAIT {}", message),
+            Action::SEED(source, target) => println!("SEED {} {}", source, target),
+            Action::GROW(size) => println!("GROW {}", size),
+            Action::COMPLETE(val) => println!("COMPLETE {}", val)
+        }
+    }
+}
+
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub struct Case {
-    pub tree: i8,
-    pub richness: i8,
-    pub is_mine: bool,
-    pub is_dormant: bool
+    pub richness: i8
 }
 
 use std::collections::HashMap;
@@ -62,6 +71,15 @@ pub fn getIdMapping() -> HashMap<i16, Vec<i16>> {
 }
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
+pub struct Tree {
+    pub id_case: i16,
+    pub coord: Vec<i16>,
+    pub size: i8,
+    pub is_mine: bool,
+    pub is_dormant: bool
+}
+
+#[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub struct Player {
     pub sun: i32,
     pub score: i32,
@@ -74,5 +92,6 @@ pub struct Game {
     pub nextCompleteScore: i32,
     pub myPlayer: Player,
     pub vsPlayer: Player,
-    pub actions: Vec<Action>
+    pub actions: Vec<Action>,
+    pub trees: Vec<Tree>
 }

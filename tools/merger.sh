@@ -97,6 +97,8 @@ do
 done
 
 perl -i -0pe 's|^#\[cfg\(test\)\].*?^}||gms' "${OUTPUT_SRC}"
+perl -i -0pe 's|//.*||g' "${OUTPUT_SRC}"
+perl -i -0pe 's|/\*.*?\*/||gms' "${OUTPUT_SRC}"
 
 sed -i "s|^pub mod .*;||g" "${OUTPUT_SRC}"
 sed -i "s|^use crate.*;||g" "${OUTPUT_SRC}"
@@ -104,6 +106,12 @@ sed -i "s|^use crate.*;||g" "${OUTPUT_SRC}"
 perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"
 perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"
 perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"
+
+perl -i -0pe 's|  | |g' "${OUTPUT_SRC}"
+perl -i -0pe 's|  | |g' "${OUTPUT_SRC}"
+perl -i -0pe 's|  | |g' "${OUTPUT_SRC}"
+perl -i -0pe 's|  | |g' "${OUTPUT_SRC}"
+
 
 
 CARGO_PATH="${OUTPUT}/Cargo.toml"

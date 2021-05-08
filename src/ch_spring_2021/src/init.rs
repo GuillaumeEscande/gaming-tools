@@ -4,7 +4,6 @@ use board::Hexagon;
 use crate::model;
 use board::Board;
 
-
 #[warn(unused_macros)]
 macro_rules! parse_input {
     ($x:expr, $t:ident) => ($x.trim().parse::<$t>().unwrap())
@@ -15,24 +14,21 @@ pub fn init_board( id_mapping: &HashMap<i16, Vec<i16>> ) -> Hexagon::<model::Cas
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let number_of_cells = parse_input!(input_line, i32); // 37
-    let mut board : Hexagon::<model::Case> = Hexagon::<model::Case>::new(3, &model::Case{
-        tree: -1,
-        richness: -1,
-        is_mine: false,
-        is_dormant: false
+    let mut created_board : Hexagon::<model::Case> = Hexagon::<model::Case>::new(3, &model::Case{
+        richness: -1
     });
-    for i in 0..number_of_cells as usize {
+    for _i in 0..number_of_cells as usize {
         let mut input_line = String::new();
         io::stdin().read_line(&mut input_line).unwrap();
         let inputs = input_line.split(" ").collect::<Vec<_>>();
         let index = parse_input!(inputs[0], i16); // 0 is the center cell, the next cells spiral outwards
         let richness = parse_input!(inputs[1], i8); // 0 if the cell is unusable, 1-3 for usable cells
-        board.get_mut( &id_mapping[&index] ).get_value_mut().richness = richness;
+        created_board.get_mut( &id_mapping[&index] ).get_value_mut().richness = richness;
     }
-    return board
+    return created_board
 }
 
-pub fn init_game( id_mapping: &HashMap<i16, Vec<i16>>, board: &mut Hexagon::<model::Case> ) -> model::Game {
+pub fn init_game( id_mapping: &HashMap<i16, Vec<i16>>) -> model::Game {
 
 
     let mut input_line = String::new();
@@ -54,13 +50,13 @@ pub fn init_game( id_mapping: &HashMap<i16, Vec<i16>>, board: &mut Hexagon::<mod
     let opp_is_waiting = parse_input!(inputs[2], i32); // whether your opponent is asleep until the next day
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
-    let number_of_trees = parse_input!(input_line, i32); // the current amount of trees
 
     let me : model::Player = model::Player{sun:sun, score:score, is_asleep:false};
     let opp : model::Player = model::Player{sun:opp_sun, score:opp_score, is_asleep:opp_is_waiting != 0};
 
-
-    for i in 0..number_of_trees as usize {
+    let number_of_trees = parse_input!(input_line, i32); // the current amount of trees
+    let mut trees : Vec<model::Tree> = Vec::with_capacity(number_of_trees as usize);
+    for _i in 0..number_of_trees as usize {
         let mut input_line = String::new();
         io::stdin().read_line(&mut input_line).unwrap();
         let inputs = input_line.split(" ").collect::<Vec<_>>();
@@ -68,11 +64,13 @@ pub fn init_game( id_mapping: &HashMap<i16, Vec<i16>>, board: &mut Hexagon::<mod
         let size = parse_input!(inputs[1], i8); // size of this tree: 0-3
         let is_mine = parse_input!(inputs[2], i32); // 1 if this is your tree
         let is_dormant = parse_input!(inputs[3], i32); // 1 if this tree is dormant
-
-        let mut case = board.get_mut( &id_mapping[&cell_index] ).get_value_mut();
-        case.tree = size;
-        case.is_mine = is_mine != 0;
-        case.is_dormant = is_dormant != 0;
+        trees.push(model::Tree{
+            id_case:cell_index,
+            size:size,
+            coord:id_mapping[&cell_index].clone(),
+            is_mine:is_mine!=0,
+            is_dormant:is_dormant!=0
+        });
     }
 
     let mut input_line = String::new();
@@ -112,7 +110,8 @@ pub fn init_game( id_mapping: &HashMap<i16, Vec<i16>>, board: &mut Hexagon::<mod
         nextCompleteScore:nutrients,
         myPlayer:me,
         vsPlayer:opp,
-        actions:actions
+        actions:actions,
+        trees: trees
     };
 
     return game;
