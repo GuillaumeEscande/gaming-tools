@@ -1,114 +1,19 @@
 use std::io;
-use std::rc::Rc;
-use graph;
-
-#[warn(unused_macros)]
-macro_rules! parse_input {
-    ($x:expr, $t:ident) => ($x.trim().parse::<$t>().unwrap())
-}
-
-enum Actions {
-    WAIT(String),
-    SEED(i8, i8),
-    GROW(i8),
-    COMPLETE(i8),
-}
-
-#[derive(Eq,PartialEq,Debug,Clone,Hash)]
-struct Case {
-    pub owner: i8,
-    pub tree: i8,
-    pub richness: i8
-}
-
-
-impl graph::model::Nodeable for Case {
-    fn nexts(&self) -> Vec< Rc< Case > >{
-        let mut nexts: Vec<Rc<Case>> = Vec::with_capacity(self.neighbors.len());
-        for &i in &self.neighbors {
-            nexts.push(self.all_cases.get(i as usize).unwrap().clone());
-        }
-        return nexts;
-    }
-    fn distance(&self, target: &Self) -> i64{
-        return 0;
-    }
-}
+mod model;
+mod init;
+use board::Hexagon;
+use board::Board;
 
 fn main() {
 
-    let mut input_line = String::new();
-    io::stdin().read_line(&mut input_line).unwrap();
-    let number_of_cells = parse_input!(input_line, i32); // 37
+    let id_mapping = model::getIdMapping();
 
-    let board = board::Hexagon::<Case>::new(3, &Case{
-        owner: -1,
-        tree: -1,
-        richness: -1
-    });
-
-    let  all_cases: Rc<Vec<Rc<Case>>> = Rc::new(Vec::with_capacity(number_of_cells as usize));
-    use std::borrow::BorrowMut;
-
-    for i in 0..number_of_cells as usize {
-        all_cases.borrow_mut().push(Rc::new())
-    }
-
-    for i in 0..number_of_cells as usize {
-        let mut input_line = String::new();
-        io::stdin().read_line(&mut input_line).unwrap();
-        let inputs = input_line.split(" ").collect::<Vec<_>>();
-        let index = parse_input!(inputs[0], i32); // 0 is the center cell, the next cells spiral outwards
-        let richness = parse_input!(inputs[1], i32); // 0 if the cell is unusable, 1-3 for usable cells
-        let neigh_0 = parse_input!(inputs[2], i32); // the index of the neighbouring cell for each direction
-        let neigh_1 = parse_input!(inputs[3], i32);
-        let neigh_2 = parse_input!(inputs[4], i32);
-        let neigh_3 = parse_input!(inputs[5], i32);
-        let neigh_4 = parse_input!(inputs[6], i32);
-        let neigh_5 = parse_input!(inputs[7], i32);
-
-        eprintln!("{:?}", inputs);
-    }
+    let mut board = init::init_board(&id_mapping);
 
     // game loop
     loop {
-        let mut input_line = String::new();
-        io::stdin().read_line(&mut input_line).unwrap();
-        let day = parse_input!(input_line, i32); // the game lasts 24 days: 0-23
-        let mut input_line = String::new();
-        io::stdin().read_line(&mut input_line).unwrap();
-        let nutrients = parse_input!(input_line, i32); // the base score you gain from the next COMPLETE action
-        let mut input_line = String::new();
-        io::stdin().read_line(&mut input_line).unwrap();
-        let inputs = input_line.split(" ").collect::<Vec<_>>();
-        let sun = parse_input!(inputs[0], i32); // your sun points
-        let score = parse_input!(inputs[1], i32); // your current score
-        let mut input_line = String::new();
-        io::stdin().read_line(&mut input_line).unwrap();
-        let inputs = input_line.split(" ").collect::<Vec<_>>();
-        let opp_sun = parse_input!(inputs[0], i32); // opponent's sun points
-        let opp_score = parse_input!(inputs[1], i32); // opponent's score
-        let opp_is_waiting = parse_input!(inputs[2], i32); // whether your opponent is asleep until the next day
-        let mut input_line = String::new();
-        io::stdin().read_line(&mut input_line).unwrap();
-        let number_of_trees = parse_input!(input_line, i32); // the current amount of trees
-        for i in 0..number_of_trees as usize {
-            let mut input_line = String::new();
-            io::stdin().read_line(&mut input_line).unwrap();
-            let inputs = input_line.split(" ").collect::<Vec<_>>();
-            let cell_index = parse_input!(inputs[0], i32); // location of this tree
-            let size = parse_input!(inputs[1], i32); // size of this tree: 0-3
-            let is_mine = parse_input!(inputs[2], i32); // 1 if this is your tree
-            let is_dormant = parse_input!(inputs[3], i32); // 1 if this tree is dormant
-        }
-        let mut input_line = String::new();
-        io::stdin().read_line(&mut input_line).unwrap();
-        let number_of_possible_moves = parse_input!(input_line, i32);
-        for i in 0..number_of_possible_moves as usize {
-            let mut input_line = String::new();
-            io::stdin().read_line(&mut input_line).unwrap();
-            let possible_move = input_line.trim_matches('\n').to_string();
-        }
+
+        let game = init::init_game(&id_mapping, &mut board);
 
         // Write an action using println!("message...");
         // To debug: eprintln!("Debug message...");

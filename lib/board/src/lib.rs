@@ -3,6 +3,7 @@ use std::vec::Vec;
 pub trait BoardCase< T: Eq + PartialEq + Sized > {
     fn position(&self)->Vec<i16>;
     fn get_value(&self)->&T;
+    fn get_value_mut(&mut self)->&mut T;
     fn set_value(&mut self, value : &T);
 }
 
@@ -10,6 +11,7 @@ pub trait Board< T : Eq + PartialEq + Sized > {
     fn neighbors(&self, origin: &dyn BoardCase<T> )->Vec<&dyn BoardCase<T> >;
     fn distance(&self, origin: &dyn BoardCase<T>, target: &dyn BoardCase<T>)->i16;
     fn get(&self, pos: &Vec<i16>)->&dyn BoardCase<T>;
+    fn get_mut(&mut self, pos: &Vec<i16>)->&mut dyn BoardCase<T>;
     fn size(&self) -> Vec<usize>;
     fn print(&self);
 }
@@ -29,6 +31,9 @@ impl< T : Eq + PartialEq + Sized + Clone > BoardCase< T > for HexagonCase< T > {
     }
     fn get_value(&self)->&T{
         return &self.value;
+    }
+    fn get_value_mut(&mut self)->&mut T{
+        return &mut self.value;
     }
     fn set_value(&mut self, value : &T){
         self.value = value.clone();
@@ -120,6 +125,14 @@ impl< T : Eq + PartialEq + Sized + Clone > Board< T > for Hexagon< T > {
         let pos3 : usize = (pos[2] + self.size as i16) as usize;
 
         &self.board[pos1][pos2][pos3]
+    }
+
+    fn get_mut(&mut self, pos: &Vec<i16>)->&mut dyn BoardCase<T>{
+        let pos1 : usize = (pos[0] + self.size as i16) as usize;
+        let pos2 : usize = (pos[1] + self.size as i16) as usize;
+        let pos3 : usize = (pos[2] + self.size as i16) as usize;
+
+        &mut self.board[pos1][pos2][pos3]
     }
 
     fn print(&self){

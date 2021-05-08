@@ -53,19 +53,53 @@ do
         echo "}" >> "${OUTPUT_SRC}"
     done
     echo "}" >> "${OUTPUT_SRC}"
+
+    for file in $(ls ./lib/$LIB/src/*.rs)
+    do
+        filename=$(basename -- "$file")
+        filename="${filename%.*}"
+        echo "use $LIB::${filename}::*;" >> "${OUTPUT_SRC}"
+    done
 done
 
-cat ./src/${SRC}/src/*.rs >> "${OUTPUT_SRC}"
+
+for file in $(ls ./src/${SRC}/src/*.rs)
+do
+    filename=$(basename -- "$file")
+    filename="${filename%.*}"
+    if [[ $filename == "main" ]]; then
+        cat $file >> "${OUTPUT_SRC}"
+    else
+        echo "pub mod $filename{" >> "${OUTPUT_SRC}"
+        echo "use super::*;" >> "${OUTPUT_SRC}"
+        cat $file >> "${OUTPUT_SRC}"
+        echo "}" >> "${OUTPUT_SRC}"
+    fi
+done
 
 for LIB in ${LIBS[@]}
 do
-    sed -i "s|use $LIB.*||g" "${OUTPUT_SRC}"
+    sed -i "s|^use $LIB.*||g" "${OUTPUT_SRC}"
+    for file in $(ls ./lib/$LIB/src/*.rs)
+    do
+        filename=$(basename -- "$file")
+        filename="${filename%.*}"
+        echo "use $LIB::${filename}::*;" >> "${OUTPUT_SRC}"
+    done
+done
+
+for file in $(ls ./src/${SRC}/src/*.rs)
+do
+    filename=$(basename -- "$file")
+    filename="${filename%.*}"
+    sed -i "s|^use $filename.*||g" "${OUTPUT_SRC}"
+    sed -i "s|^mod $filename;||g" "${OUTPUT_SRC}"
 done
 
 perl -i -0pe 's|^#\[cfg\(test\)\].*?^}||gms' "${OUTPUT_SRC}"
 
-sed -i "s|pub mod .*;||g" "${OUTPUT_SRC}"
-sed -i "s|use crate.*;||g" "${OUTPUT_SRC}"
+sed -i "s|^pub mod .*;||g" "${OUTPUT_SRC}"
+sed -i "s|^use crate.*;||g" "${OUTPUT_SRC}"
 
 perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"
 perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"

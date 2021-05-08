@@ -35,7 +35,7 @@ merge: merge_ch_sring_2021
 
 merge_ch_sring_2021:
 	mkdir -p target
-	./tools/merger.sh -l graph -l gamio -l logger -o ./target ch_spring_2021
+	./tools/merger.sh -l board -l graph -l gamio -l logger -o ./target ch_spring_2021
 	cd target && \
 	cargo test
 	
