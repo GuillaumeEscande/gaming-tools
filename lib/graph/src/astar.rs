@@ -1,68 +1,66 @@
 // Graph module with implementation Graph seaRCh algorithms
-pub mod graph {
-    use std::vec::Vec;
-    use crate::model::graph;
-    use std::collections::LinkedList;
-    use std::fmt::Debug;
+use std::vec::Vec;
+use std::collections::LinkedList;
+use std::fmt::Debug;
+use std::rc::Rc;
+
+use crate::model;
+
+// ReseaRCh shortesd path on the graph between start and target
+
+pub fn resolve_astar< T : model::Nodeable + Clone + Debug>(
+    start: &Rc<T>,
+    target: &Rc<T> ) -> LinkedList<Rc<T>> {
+    
+    let mut targeted_nodes : Vec< model::Way<T> > = Vec::new();
+    let mut fisrt_way_ls : LinkedList<Rc<T>> = LinkedList::new();
+    let initial_distance = start.distance(target);
+    fisrt_way_ls.push_back(start.clone());
+    let first_way : model::Way<T> = model::Way{
+        nodes: fisrt_way_ls,
+        distance: initial_distance
+    };
+
+    targeted_nodes.push(first_way);
+
+    // While target of the best way 
+    while targeted_nodes.len() > 0 && targeted_nodes.last().unwrap().nodes.back().unwrap() != target {
+
+        let better_way : model::Way<T> = targeted_nodes.pop().unwrap();
+
+        let next_nodes : Vec<Rc<T>> = better_way.nodes.back().unwrap().nexts();
 
 
-    // ReseaRCh shortesd path on the graph between start and target
-
-    pub fn resolve_astar< T : graph::Nodeable + Clone + Debug>(
-        start: &T,
-        target: &T ) -> LinkedList<T> {
-        
-        let mut targeted_nodes : Vec< graph::Way<T> > = Vec::new();
-        let mut fisrt_way_ls : LinkedList<T> = LinkedList::new();
-        let initial_distance = start.distance(target);
-        fisrt_way_ls.push_back(start.clone());
-        let first_way : graph::Way<T> = graph::Way{
-            nodes: fisrt_way_ls,
-            distance: initial_distance
-        };
-
-        targeted_nodes.push(first_way);
-
-        // While target of the best way 
-        while targeted_nodes.len() > 0 && targeted_nodes.last().unwrap().nodes.back().unwrap() != target {
-
-            let better_way : graph::Way<T> = targeted_nodes.pop().unwrap();
-
-            let next_nodes : Vec< T > = better_way.nodes.back().unwrap().nexts();
-
-
-            for next_node in next_nodes {
-                let mut new_nodes_path = better_way.nodes.clone();
-                let new_distance = next_node.distance(target);
-                new_nodes_path.push_back(next_node);
-                let new_way : graph::Way<T> = graph::Way{
-                    nodes: new_nodes_path,
-                    distance: new_distance
-                };
-                targeted_nodes.push(new_way);
-            }
-
-            use std::cmp::Reverse;
-            targeted_nodes.sort_by_cached_key(|k|  Reverse(k.distance));
-
-
-
+        for next_node in next_nodes {
+            let mut new_nodes_path = better_way.nodes.clone();
+            let new_distance = next_node.distance(target);
+            new_nodes_path.push_back(next_node);
+            let new_way : model::Way<T> = model::Way{
+                nodes: new_nodes_path,
+                distance: new_distance
+            };
+            targeted_nodes.push(new_way);
         }
-        if targeted_nodes.len() > 0{
-            return targeted_nodes.pop().unwrap().nodes;
-        }
-        else {
-            return LinkedList::new();
-        }
+
+        use std::cmp::Reverse;
+        targeted_nodes.sort_by_cached_key(|k|  Reverse(k.distance));
+
+
+
     }
-
+    if targeted_nodes.len() > 0{
+        return targeted_nodes.pop().unwrap().nodes;
+    }
+    else {
+        return LinkedList::new();
+    }
 }
 
 
 #[cfg(test)]
 mod tests {
-    use crate::model::graph;
-    use crate::astar::graph::*;
+    use crate::model::*;
+    use crate::astar::*;
     use std::collections::LinkedList;
 
     #[test]
@@ -76,41 +74,41 @@ mod tests {
             pub y_size : i64,
         }
 
-        impl graph::Nodeable for BoardCase {
-            fn nexts(&self) -> Vec< Self >{
-                let mut nexts : Vec<BoardCase> = Vec::new();
+        impl model::Nodeable for BoardCase {
+            fn nexts(&self) -> Vec< Rc< Self > >{
+                let mut nexts : Vec<Rc<BoardCase>> = Vec::new();
 
                 if self.x > 1  {
-                    nexts.push(BoardCase{
+                    nexts.push(Rc::new(BoardCase{
                         x: self.x - 1,
                         y: self.y,
                         x_size: self.x_size,
                         y_size: self.y_size
-                    });
+                    }));
                 };
                 if self.x < (self.x_size - 1) {
-                    nexts.push(BoardCase{
+                    nexts.push(Rc::new(BoardCase{
                         x: self.x + 1,
                         y: self.y,
                         x_size: self.x_size,
                         y_size: self.y_size
-                    });
+                    }));
                 };
                 if self.y > 1  {
-                    nexts.push(BoardCase{
+                    nexts.push(Rc::new(BoardCase{
                         x: self.x,
                         y: self.y - 1,
                         x_size: self.x_size,
                         y_size: self.y_size
-                    });
+                    }));
                 };
                 if self.y < (self.y_size - 1) {
-                    nexts.push(BoardCase{
+                    nexts.push(Rc::new(BoardCase{
                         x: self.x,
                         y: self.y + 1,
                         x_size: self.x_size,
                         y_size: self.y_size
-                    });
+                    }));
                 };
                 return nexts;
             }
@@ -139,9 +137,10 @@ mod tests {
             y_size: 10,
         };
 
-        let best_way : LinkedList<BoardCase> = resolve_astar::<BoardCase>( &origin, &target );
+        let best_way : LinkedList<Rc<BoardCase>> = resolve_astar::<BoardCase>( &Rc::new(origin), &Rc::new(target) );
 
         assert_eq!(best_way.len(), 19);
         
     }
 }
+

@@ -3,10 +3,10 @@ all: test merge
 
 test: test_libs test_src
 
-test_libs: test_base test_solver test_graph test_gamio test_logger
+test_libs: test_board test_solver test_graph test_gamio test_logger
 
-test_base: 
-	cd lib/base && \
+test_board: 
+	cd lib/board && \
 	cargo test
 
 test_graph: 
@@ -35,4 +35,7 @@ merge: merge_ch_sring_2021
 
 merge_ch_sring_2021:
 	mkdir -p target
-	./tools/merger.sh -l gamio -l logger -o ./target/ch_sring_2021.rs ch_spring_2021
+	./tools/merger.sh -l graph -l gamio -l logger -o ./target ch_spring_2021
+	cd target && \
+	cargo test
+	

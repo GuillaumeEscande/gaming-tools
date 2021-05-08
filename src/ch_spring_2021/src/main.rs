@@ -1,16 +1,59 @@
-use gamio::gamio;
-use logger::logger;
 use std::io;
+use std::rc::Rc;
+use graph;
 
 #[warn(unused_macros)]
 macro_rules! parse_input {
     ($x:expr, $t:ident) => ($x.trim().parse::<$t>().unwrap())
 }
 
+enum Actions {
+    WAIT(String),
+    SEED(i8, i8),
+    GROW(i8),
+    COMPLETE(i8),
+}
+
+#[derive(Eq,PartialEq,Debug,Clone,Hash)]
+struct Case {
+    pub owner: i8,
+    pub tree: i8,
+    pub richness: i8
+}
+
+
+impl graph::model::Nodeable for Case {
+    fn nexts(&self) -> Vec< Rc< Case > >{
+        let mut nexts: Vec<Rc<Case>> = Vec::with_capacity(self.neighbors.len());
+        for &i in &self.neighbors {
+            nexts.push(self.all_cases.get(i as usize).unwrap().clone());
+        }
+        return nexts;
+    }
+    fn distance(&self, target: &Self) -> i64{
+        return 0;
+    }
+}
+
 fn main() {
+
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let number_of_cells = parse_input!(input_line, i32); // 37
+
+    let board = board::Hexagon::<Case>::new(3, &Case{
+        owner: -1,
+        tree: -1,
+        richness: -1
+    });
+
+    let  all_cases: Rc<Vec<Rc<Case>>> = Rc::new(Vec::with_capacity(number_of_cells as usize));
+    use std::borrow::BorrowMut;
+
+    for i in 0..number_of_cells as usize {
+        all_cases.borrow_mut().push(Rc::new())
+    }
+
     for i in 0..number_of_cells as usize {
         let mut input_line = String::new();
         io::stdin().read_line(&mut input_line).unwrap();
@@ -23,6 +66,8 @@ fn main() {
         let neigh_3 = parse_input!(inputs[5], i32);
         let neigh_4 = parse_input!(inputs[6], i32);
         let neigh_5 = parse_input!(inputs[7], i32);
+
+        eprintln!("{:?}", inputs);
     }
 
     // game loop

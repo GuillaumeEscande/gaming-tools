@@ -1,10 +1,10 @@
 #!/bin/bash
 
 usage(){
-    echo "merger.sh [-l <lib project name>]* [-o <file output path>] <src roject name>"
+    echo "merger.sh [-l <lib project name>]* [-o <file folder path>] <src project name>"
 }
 
-OUTPUT="main.rs"
+OUTPUT="target"
 LIBS=()
 
 
@@ -33,26 +33,52 @@ echo "OUTPUT=${OUTPUT}"
 echo "SRC=${SRC}"
 echo "LIBS=${LIBS[@]}"
 
-echo "" > "${OUTPUT}"
+mkdir -p ${OUTPUT}
+mkdir -p ${OUTPUT}/src
+
+OUTPUT_SRC="${OUTPUT}/src/main.rs"
+
+echo "/////// AUTOMATICALY - GENERATED  ///////" > "${OUTPUT_SRC}"
 
 for LIB in ${LIBS[@]}
 do
-    cat ./lib/$LIB/src/*.rs >> "${OUTPUT}"
+    echo "pub mod $LIB{" >> "${OUTPUT_SRC}"
+    for file in $(ls ./lib/$LIB/src/*.rs)
+    do
+        filename=$(basename -- "$file")
+        filename="${filename%.*}"
+        echo "pub mod $filename{" >> "${OUTPUT_SRC}"
+        echo "use super::*;" >> "${OUTPUT_SRC}"
+        cat $file >> "${OUTPUT_SRC}"
+        echo "}" >> "${OUTPUT_SRC}"
+    done
+    echo "}" >> "${OUTPUT_SRC}"
 done
 
-cat ./src/${SRC}/src/*.rs >> "${OUTPUT}"
+cat ./src/${SRC}/src/*.rs >> "${OUTPUT_SRC}"
 
 for LIB in ${LIBS[@]}
 do
-    sed -i "s|use $LIB::$LIB.*||" "${OUTPUT}"
+    sed -i "s|use $LIB.*||g" "${OUTPUT_SRC}"
 done
 
+perl -i -0pe 's|^#\[cfg\(test\)\].*?^}||gms' "${OUTPUT_SRC}"
 
-perl -i -0pe 's|^#\[cfg\(test\)\].*?^}||gms' "${OUTPUT}"
+sed -i "s|pub mod .*;||g" "${OUTPUT_SRC}"
+sed -i "s|use crate.*;||g" "${OUTPUT_SRC}"
 
-perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT}"
-perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT}"
-perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT}"
+perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"
+perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"
+perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"
 
 
+CARGO_PATH="${OUTPUT}/Cargo.toml"
+cat <<EOF > $CARGO_PATH
+[package]
+name = "${SRC}"
+version = "1.0.0"
+authors = ["Guillaume Escande <escande.guillaume@gmail.com>"]
+edition = "2018"
 
+[dependencies]
+EOF

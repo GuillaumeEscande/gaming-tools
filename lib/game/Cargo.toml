@@ -1,5 +1,5 @@
 [package]
-name = "ch_spring_2021"
+name = "game"
 version = "0.1.0"
 authors = ["Guillaume Escande <escande.guillaume@gmail.com>"]
 edition = "2018"
@@ -7,8 +7,4 @@ edition = "2018"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
-graph = { path = "../../lib/graph" }
 board = { path = "../../lib/board" }
-game = { path = "../../lib/game" }
-logger = { path = "../../lib/logger" }
-gamio = { path = "../../lib/gamio" }

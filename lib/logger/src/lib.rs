@@ -1,9 +1,8 @@
 
-pub mod logger {
-    #[warn(dead_code)]
-    pub fn debug(message: &str) {
-        println!("{}", message);
-    }
+
+#[warn(dead_code)]
+pub fn debug(message: &str) {
+    println!("{}", message);
 }
 
 
@@ -15,3 +14,4 @@ mod tests {
         assert_eq!(3, 3);
     }
 }
+
