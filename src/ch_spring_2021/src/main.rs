@@ -1,9 +1,10 @@
 mod model;
 mod init;
+mod choose;
 
 fn main() {
     // Init data
-    let id_mapping = model::getIdMapping();
+    let id_mapping = model::get_id_mapping();
     let board = init::init_board(&id_mapping);
 
     // game loop
@@ -15,37 +16,13 @@ fn main() {
         let mut used_sun = 0;
         
         loop {
-            if used_sun < game.myPlayer.sun {
+            if used_sun < game.me.sun {
                 break;
             }
 
-            // First action - find COMPLETE
-            let complete_index = game.actions.iter().position(|x| matches!(x, model::Action::COMPLETE(_)));
-            if complete_index.is_some() {
-                let action = game.actions.remove(complete_index.unwrap());
-                action.print();
-                used_sun += 1;
-                continue;
-            }
+            let action = choose::choose1(&mut used_sun, &id_mapping, &board, &mut game);
 
-            // Second action - SEED directly on the sun
-            let mut seed : Option<usize> = None;
-            for i in 0..game.actions.len() {
-                match &game.actions[i] {
-                    &model::Action::SEED(source, target) => {
-                        if target < 6 {
-                            seed = Some(i);
-                        }
-                    },
-                    _ => ()
-                }
-            }
-            if seed.is_some() {
-                let action = game.actions.remove(seed.unwrap());
-                action.print();
-                used_sun += 1;
-                continue;
-            }
+            action.print();
 
 
 

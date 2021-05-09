@@ -103,6 +103,8 @@ perl -i -0pe 's|/\*.*?\*/||gms' "${OUTPUT_SRC}"
 sed -i "s|^pub mod .*;||g" "${OUTPUT_SRC}"
 sed -i "s|^use crate.*;||g" "${OUTPUT_SRC}"
 
+perl -i -0pe 's|^\n||gms' "${OUTPUT_SRC}"
+perl -i -0pe 's|^ *\n||gms' "${OUTPUT_SRC}"
 perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"
 perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"
 perl -i -0pe 's|\n\n|\n|gms' "${OUTPUT_SRC}"

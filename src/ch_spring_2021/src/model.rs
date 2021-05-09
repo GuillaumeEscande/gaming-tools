@@ -20,13 +20,20 @@ impl Action {
 }
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
+pub struct Actions {
+    pub completes: Vec<Action>,
+    pub grows: Vec<Action>,
+    pub seeds: Vec<Action>,
+}
+
+#[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub struct Case {
     pub richness: i8
 }
 
 use std::collections::HashMap;
 
-pub fn getIdMapping() -> HashMap<i16, Vec<i16>> {
+pub fn get_id_mapping() -> HashMap<i16, Vec<i16>> {
     let mut id_maping = HashMap::with_capacity(37);
 
     id_maping.insert( 0, vec!( 0,  0,  0));
@@ -89,9 +96,9 @@ pub struct Player {
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub struct Game {
     pub day: i32,
-    pub nextCompleteScore: i32,
-    pub myPlayer: Player,
-    pub vsPlayer: Player,
-    pub actions: Vec<Action>,
+    pub nutrients: i32,
+    pub me: Player,
+    pub opp: Player,
+    pub actions: Actions,
     pub trees: Vec<Tree>
 }

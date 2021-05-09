@@ -77,39 +77,40 @@ pub fn init_game( id_mapping: &HashMap<i16, Vec<i16>>) -> model::Game {
     io::stdin().read_line(&mut input_line).unwrap();
     let number_of_possible_moves = parse_input!(input_line, i32);
 
-    let mut actions : Vec<model::Action> = Vec::with_capacity(number_of_possible_moves as usize);
+    let mut completes: Vec<model::Action> = Vec::<model::Action>::new();
+    let mut grows: Vec<model::Action> = Vec::<model::Action>::new();
+    let mut seeds: Vec<model::Action> = Vec::<model::Action>::new();
 
-    for i in 0..number_of_possible_moves as usize {
+    for _i in 0..number_of_possible_moves as usize {
         let mut input_line = String::new();
         io::stdin().read_line(&mut input_line).unwrap();
         let possible_move = input_line.trim_matches('\n').split(" ").collect::<Vec<_>>();
         if possible_move[0] == "GROW" {
             let grow = parse_input!(possible_move[1], i8);
-            actions.push(model::Action::GROW(grow));
+            grows.push(model::Action::GROW(grow));
         }
         if possible_move[0] == "SEED" {
-            let sourceIdx = parse_input!(possible_move[1], i8);
-            let targetIdx = parse_input!(possible_move[1], i8);
-            actions.push(model::Action::SEED(sourceIdx, targetIdx));
+            let source_idx = parse_input!(possible_move[1], i8);
+            let target_idx = parse_input!(possible_move[1], i8);
+            seeds.push(model::Action::SEED(source_idx, target_idx));
         }
         if possible_move[0] == "COMPLETE" {
-            let cellIdx = parse_input!(possible_move[1], i8);
-            actions.push(model::Action::COMPLETE(cellIdx));
-        }
-        if possible_move[0] == "WAIT" {
-            let mut message = "";
-            if possible_move.len() > 1 {
-                message = possible_move[1];
-            }
-            actions.push(model::Action::WAIT(message.to_string()));
+            let cell_idx = parse_input!(possible_move[1], i8);
+            completes.push(model::Action::COMPLETE(cell_idx));
         }
     }
 
-    let mut game : model::Game = model::Game{
+    let actions : model::Actions = model::Actions{
+        completes: completes,
+        grows: grows,
+        seeds: seeds,
+    };
+
+    let game : model::Game = model::Game{
         day:day,
-        nextCompleteScore:nutrients,
-        myPlayer:me,
-        vsPlayer:opp,
+        nutrients:nutrients,
+        me:me,
+        opp:opp,
         actions:actions,
         trees: trees
     };
