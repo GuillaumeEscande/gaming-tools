@@ -1,31 +1,33 @@
 use std::vec::Vec;
+use std::hash::Hash;
+use std::fmt::Debug;
+use std::rc::Rc;
 
-pub trait BoardCase< T: Eq + PartialEq + Sized > {
+pub trait BoardCase< T: Eq + PartialEq + Sized + Hash + Debug > : Debug {
     fn position(&self)->Vec<i16>;
     fn get_value(&self)->&T;
     fn get_value_mut(&mut self)->&mut T;
     fn set_value(&mut self, value : &T);
 }
 
-pub trait Board< T : Eq + PartialEq + Sized > {
-    fn neighbors(&self, origin: &dyn BoardCase<T> )->Vec<&dyn BoardCase<T> >;
-    fn distance(&self, origin: &dyn BoardCase<T>, target: &dyn BoardCase<T>)->i16;
-    fn get(&self, pos: &Vec<i16>)->&dyn BoardCase<T>;
-    fn get_mut(&mut self, pos: &Vec<i16>)->&mut dyn BoardCase<T>;
+pub trait Board< T : Eq + PartialEq + Sized + Debug > : Debug {
+    fn neighbors(&self, origin: &Rc<dyn BoardCase<T>> )->Vec<Rc<dyn BoardCase<T>>>;
+    fn distance(&self, origin: &Rc<dyn BoardCase<T>>, target: &Rc<dyn BoardCase<T>>)->i16;
+    fn get(&self, pos: &Vec<i16>)->Rc<dyn BoardCase<T>>;
     fn size(&self) -> Vec<usize>;
     fn print(&self);
 }
 
 
 #[derive(Debug)]
-pub struct HexagonCase< T : Eq + PartialEq + Sized > {
+pub struct HexagonCase< T : Eq + PartialEq + Sized + Debug > {
     line1 : i16,
     line2 : i16,
     line3 : i16,
     value: T,
 }
 
-impl< T : Eq + PartialEq + Sized + Clone > BoardCase< T > for HexagonCase< T > {
+impl< T : Eq + PartialEq + Sized + Clone + Hash + Debug > BoardCase< T > for HexagonCase< T > {
     fn position(&self)->Vec<i16>{
         return vec!(self.line1, self.line2, self.line3);
     }
@@ -41,12 +43,12 @@ impl< T : Eq + PartialEq + Sized + Clone > BoardCase< T > for HexagonCase< T > {
 }
 
 #[derive(Debug)]
-pub struct Hexagon< T : Eq + PartialEq + Sized > {
+pub struct Hexagon< T : Eq + PartialEq + Sized + Debug + Hash > {
     size: usize,
-    board : Vec< Vec< Vec< HexagonCase<T> > > >
+    board : Vec< Vec< Vec< Rc< dyn BoardCase< T > > > > >
 }
 
-impl< T : Eq + PartialEq + Sized + Clone > Hexagon<T>{
+impl< T : 'static + Eq + PartialEq + Sized + Clone + Debug + Hash > Hexagon<T>{
     pub fn new(size : usize, default: &T) -> Hexagon<T>{
 
         let mut board = Vec::with_capacity(size);
@@ -57,12 +59,12 @@ impl< T : Eq + PartialEq + Sized + Clone > Hexagon<T>{
             for c2 in 0..real_size{
                 board[c1].push(Vec::with_capacity(real_size));
                 for c3 in 0..real_size{
-                    let case = HexagonCase::<T>{
+                    let case : Rc< dyn BoardCase< T > > = Rc::new(HexagonCase::<T>{
                         line1 : c1 as i16 - size as i16,
                         line2 : c2 as i16 - size as i16,
                         line3 : c3 as i16 - size as i16,
                         value: default.clone(),
-                    };
+                    });
                     board[c1][c2].push(case);
                 }
             }
@@ -75,38 +77,38 @@ impl< T : Eq + PartialEq + Sized + Clone > Hexagon<T>{
     }
 }
 
-impl< T : Eq + PartialEq + Sized + Clone > Board< T > for Hexagon< T > {
-    fn neighbors(&self, origin: &dyn BoardCase<T> )->Vec<&dyn BoardCase<T> >{
+impl< T : Eq + PartialEq + Sized + Clone + Hash + Debug > Board< T > for Hexagon< T > {
+    fn neighbors(&self, origin: &Rc<dyn BoardCase<T>> )->Vec<Rc<dyn BoardCase<T>> >{
         let pos1 : usize = (origin.position()[0] + self.size as i16) as usize;
         let pos2 : usize = (origin.position()[1] + self.size as i16) as usize;
         let pos3 : usize = (origin.position()[2] + self.size as i16) as usize;
 
-        let mut neighbors : Vec<&dyn BoardCase<T>> = Vec::with_capacity(6);
+        let mut neighbors : Vec<Rc<dyn BoardCase<T>>> = Vec::with_capacity(6);
 
         let real_size : usize = 1 + self.size * 2;
 
         if pos1 > 1 && (pos2 < (real_size - 1)) {
-            neighbors.push(&self.board[pos1-1][pos2+1][pos3  ]);
+            neighbors.push(Rc::clone(&self.board[pos1-1][pos2+1][pos3  ]));
         }
         if pos2 > 1 && (pos3 < (real_size - 1)) {
-            neighbors.push(&self.board[pos1  ][pos2-1][pos3+1]);
+            neighbors.push(Rc::clone(&self.board[pos1  ][pos2-1][pos3+1]));
         }
         if pos3 > 1 && (pos1 < (real_size - 1)) {
-            neighbors.push(&self.board[pos1+1][pos2  ][pos3-1]);
+            neighbors.push(Rc::clone(&self.board[pos1+1][pos2  ][pos3-1]));
         }
         if pos2 > 1 && (pos1 < (real_size - 1)) {
-            neighbors.push(&self.board[pos1+1][pos2-1][pos3  ]);
+            neighbors.push(Rc::clone(&self.board[pos1+1][pos2-1][pos3  ]));
         }
         if pos3 > 1 && (pos2 < (real_size - 1)) {
-            neighbors.push(&self.board[pos1  ][pos2+1][pos3-1]);
+            neighbors.push(Rc::clone(&self.board[pos1  ][pos2+1][pos3-1]));
         }
         if pos1 > 1 && (pos3 < (real_size - 1)) {
-            neighbors.push(&self.board[pos1-1][pos2  ][pos3+1]);
+            neighbors.push(Rc::clone(&self.board[pos1-1][pos2  ][pos3+1]));
         }
 
         return neighbors;
     }
-    fn distance(&self, origin: &dyn BoardCase<T>, target: &dyn BoardCase<T>)->i16{
+    fn distance(&self, origin: &Rc<dyn BoardCase<T>>, target: &Rc<dyn BoardCase<T>>)->i16{
         use std::cmp;
         let mut distance : i16 = 0;
         
@@ -119,20 +121,12 @@ impl< T : Eq + PartialEq + Sized + Clone > Board< T > for Hexagon< T > {
         return vec!(self.size, self.size, self.size);
     }
 
-    fn get(&self, pos: &Vec<i16>)->&dyn BoardCase<T>{
+    fn get(&self, pos: &Vec<i16>)->Rc<dyn BoardCase<T>>{
         let pos1 : usize = (pos[0] + self.size as i16) as usize;
         let pos2 : usize = (pos[1] + self.size as i16) as usize;
         let pos3 : usize = (pos[2] + self.size as i16) as usize;
 
-        &self.board[pos1][pos2][pos3]
-    }
-
-    fn get_mut(&mut self, pos: &Vec<i16>)->&mut dyn BoardCase<T>{
-        let pos1 : usize = (pos[0] + self.size as i16) as usize;
-        let pos2 : usize = (pos[1] + self.size as i16) as usize;
-        let pos3 : usize = (pos[2] + self.size as i16) as usize;
-
-        &mut self.board[pos1][pos2][pos3]
+        return Rc::clone(&self.board[pos1][pos2][pos3]);
     }
 
     fn print(&self){
@@ -178,18 +172,18 @@ mod tests {
     fn test_nominal() {
         let board = Hexagon::<i16>::new( 3, &0);
         assert_eq!(board.size(), vec!(3, 3, 3));
-        assert_eq!(board.neighbors( board.get( &vec!(3, -3, 0) ) ).len(), 3);
-        assert_eq!(board.neighbors( board.get( &vec!(0, -3, 3) ) ).len(), 3);
-        assert_eq!(board.neighbors( board.get( &vec!(-3, 2, 1) ) ).len(), 4);
-        assert_eq!(board.neighbors( board.get( &vec!(-1, -1, 2) ) ).len(), 6);
-        assert_eq!(board.neighbors( board.get( &vec!(0, 0, 0) ) ).len(), 6);
+        assert_eq!(board.neighbors( &board.get( &vec!(3, -3, 0) ) ).len(), 3);
+        assert_eq!(board.neighbors( &board.get( &vec!(0, -3, 3) ) ).len(), 3);
+        assert_eq!(board.neighbors( &board.get( &vec!(-3, 2, 1) ) ).len(), 4);
+        assert_eq!(board.neighbors( &board.get( &vec!(-1, -1, 2) ) ).len(), 6);
+        assert_eq!(board.neighbors( &board.get( &vec!(0, 0, 0) ) ).len(), 6);
 
-        assert_eq!(board.distance( board.get( &vec!(0, 0, 0) ), board.get( &vec!(0, 0, 0) ) ), 0);
-        assert_eq!(board.distance( board.get( &vec!(0, 0, 0) ), board.get( &vec!(-1, 1, 0) ) ), 1);
-        assert_eq!(board.distance( board.get( &vec!(0, 0, 0) ), board.get( &vec!(1, 1, -2) ) ), 2);
-        assert_eq!(board.distance( board.get( &vec!(0, 0, 0) ), board.get( &vec!(3, -2, -1) ) ), 3);
-        assert_eq!(board.distance( board.get( &vec!(-3, 0, 3) ), board.get( &vec!(2, -3, 1) ) ), 5);
-        assert_eq!(board.distance( board.get( &vec!(1, -3, 2) ), board.get( &vec!(0, 3, -3) ) ), 6);
+        assert_eq!(board.distance( &board.get( &vec!(0, 0, 0) ), &board.get( &vec!(0, 0, 0) ) ), 0);
+        assert_eq!(board.distance( &board.get( &vec!(0, 0, 0) ), &board.get( &vec!(-1, 1, 0) ) ), 1);
+        assert_eq!(board.distance( &board.get( &vec!(0, 0, 0) ), &board.get( &vec!(1, 1, -2) ) ), 2);
+        assert_eq!(board.distance( &board.get( &vec!(0, 0, 0) ), &board.get( &vec!(3, -2, -1) ) ), 3);
+        assert_eq!(board.distance( &board.get( &vec!(-3, 0, 3) ), &board.get( &vec!(2, -3, 1) ) ), 5);
+        assert_eq!(board.distance( &board.get( &vec!(1, -3, 2) ), &board.get( &vec!(0, 3, -3) ) ), 6);
 
         board.print();
     }

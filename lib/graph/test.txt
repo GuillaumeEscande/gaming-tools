@@ -1,0 +1,120 @@
+   Compiling graph v0.1.0 (/home/gescande/workspace/gaming-tools/lib/graph)
+warning: unused import: `crate::model::*`
+  --> src/astar.rs:65:9
+   |
+65 |     use crate::model::*;
+   |         ^^^^^^^^^^^^^^^
+   |
+   = note: `#[warn(unused_imports)]` on by default
+
+warning: unused import: `crate::astar::*`
+  --> src/astar.rs:66:9
+   |
+66 |     use crate::astar::*;
+   |         ^^^^^^^^^^^^^^^
+
+warning: unused import: `std::collections::LinkedList`
+  --> src/astar.rs:67:9
+   |
+67 |     use std::collections::LinkedList;
+   |         ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+error[E0277]: the trait bound `&&dyn BoardCase<T>: BoardCase<T>` is not satisfied
+  --> src/astar.rs:21:28
+   |
+21 |     fisrt_way_ls.push_back(Rc::new(&start));
+   |                            ^^^^^^^^^^^^^^^ the trait `BoardCase<T>` is not implemented for `&&dyn BoardCase<T>`
+   |
+   = note: required for the cast to the object type `dyn BoardCase<T>`
+
+error[E0277]: the trait bound `&&dyn BoardCase<T>: BoardCase<T>` is not satisfied
+  --> src/astar.rs:21:28
+   |
+21 |     fisrt_way_ls.push_back(Rc::new(&start));
+   |                            ^^^^^^^^^^^^^^^ the trait `BoardCase<T>` is not implemented for `&&dyn BoardCase<T>`
+   |
+   = note: required for the cast to the object type `dyn BoardCase<T>`
+
+error[E0308]: mismatched types
+  --> src/astar.rs:24:19
+   |
+24 |         distance: initial_distance
+   |                   ^^^^^^^^^^^^^^^^ expected `i64`, found `i16`
+
+error[E0369]: binary operation `!=` cannot be applied to type `&Rc<dyn BoardCase<T>>`
+  --> src/astar.rs:30:92
+   |
+30 |     while targeted_nodes.len() > 0 && targeted_nodes.last().unwrap().nodes.back().unwrap() != target {
+   |                                       ---------------------------------------------------- ^^ ------ &dyn BoardCase<T>
+   |                                       |
+   |                                       &Rc<dyn BoardCase<T>>
+   |
+   = note: the trait `std::cmp::PartialEq` is not implemented for `&Rc<dyn BoardCase<T>>`
+
+error[E0308]: mismatched types
+  --> src/astar.rs:24:19
+   |
+24 |         distance: initial_distance
+   |                   ^^^^^^^^^^^^^^^^ expected `i64`, found `i16`
+
+error[E0599]: no method named `nexts` found for reference `&Rc<dyn BoardCase<T>>` in the current scope
+  --> src/astar.rs:34:94
+   |
+34 |         let next_nodes : Vec<Rc<dyn board::BoardCase<T>>> = better_way.nodes.back().unwrap().nexts();
+   |                                                                                              ^^^^^ method not found in `&Rc<dyn BoardCase<T>>`
+
+error[E0369]: binary operation `!=` cannot be applied to type `&Rc<dyn BoardCase<T>>`
+  --> src/astar.rs:30:92
+   |
+30 |     while targeted_nodes.len() > 0 && targeted_nodes.last().unwrap().nodes.back().unwrap() != target {
+   |                                       ---------------------------------------------------- ^^ ------ &dyn BoardCase<T>
+   |                                       |
+   |                                       &Rc<dyn BoardCase<T>>
+   |
+   = note: the trait `std::cmp::PartialEq` is not implemented for `&Rc<dyn BoardCase<T>>`
+
+error[E0599]: no method named `distance` found for struct `Rc<dyn BoardCase<T>>` in the current scope
+  --> src/astar.rs:39:42
+   |
+39 |             let new_distance = next_node.distance(target);
+   |                                          ^^^^^^^^ method not found in `Rc<dyn BoardCase<T>>`
+
+error[E0599]: no method named `nexts` found for reference `&Rc<dyn BoardCase<T>>` in the current scope
+  --> src/astar.rs:34:94
+   |
+34 |         let next_nodes : Vec<Rc<dyn board::BoardCase<T>>> = better_way.nodes.back().unwrap().nexts();
+   |                                                                                              ^^^^^ method not found in `&Rc<dyn BoardCase<T>>`
+
+warning: unused import: `board`
+ --> src/astar.rs:7:5
+  |
+7 | use board::*;
+  |     ^^^^^
+
+error: aborting due to 5 previous errors; 4 warnings emitted
+
+Some errors have detailed explanations: E0277, E0308, E0369, E0599.
+For more information about an error, try `rustc --explain E0277`.
+error[E0599]: no method named `distance` found for struct `Rc<dyn BoardCase<T>>` in the current scope
+  --> src/astar.rs:39:42
+   |
+39 |             let new_distance = next_node.distance(target);
+   |                                          ^^^^^^^^ method not found in `Rc<dyn BoardCase<T>>`
+
+error: could not compile `graph`
+
+To learn more, run the command again with --verbose.
+warning: build failed, waiting for other jobs to finish...
+warning: unused import: `board`
+ --> src/astar.rs:7:5
+  |
+7 | use board::*;
+  |     ^^^^^
+  |
+  = note: `#[warn(unused_imports)]` on by default
+
+error: aborting due to 5 previous errors; 1 warning emitted
+
+Some errors have detailed explanations: E0277, E0308, E0369, E0599.
+For more information about an error, try `rustc --explain E0277`.
+error: build failed

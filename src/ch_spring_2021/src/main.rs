@@ -20,7 +20,7 @@ fn main() {
         eprintln!("Sun points : {}", game.me.sun);
         if game.me.sun <= used_sun {
             eprintln!("---------- WAIT ----------");
-            model::Action::WAIT("Tu va creuver".to_string()).print();
+            model::Action::WAIT("Plus de points".to_string()).print();
         } else {
             eprintln!("---------- CHOOSE ACTION ----------");
 
