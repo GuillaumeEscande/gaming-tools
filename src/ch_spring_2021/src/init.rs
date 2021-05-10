@@ -55,7 +55,7 @@ pub fn init_game( id_mapping: &HashMap<i16, Vec<i16>>) -> model::Game {
     let opp : model::Player = model::Player{sun:opp_sun, score:opp_score, is_asleep:opp_is_waiting != 0};
 
     let number_of_trees = parse_input!(input_line, i32); // the current amount of trees
-    let mut trees : Vec<model::Tree> = Vec::with_capacity(number_of_trees as usize);
+    let mut trees : Vec<Option<model::Tree>> = vec![None; 37];
     for _i in 0..number_of_trees as usize {
         let mut input_line = String::new();
         io::stdin().read_line(&mut input_line).unwrap();
@@ -64,7 +64,7 @@ pub fn init_game( id_mapping: &HashMap<i16, Vec<i16>>) -> model::Game {
         let size = parse_input!(inputs[1], i8); // size of this tree: 0-3
         let is_mine = parse_input!(inputs[2], i32); // 1 if this is your tree
         let is_dormant = parse_input!(inputs[3], i32); // 1 if this tree is dormant
-        trees.push(model::Tree{
+        trees[cell_index as usize] = Some(model::Tree{
             id_case:cell_index,
             size:size,
             coord:id_mapping[&cell_index].clone(),
@@ -91,7 +91,7 @@ pub fn init_game( id_mapping: &HashMap<i16, Vec<i16>>) -> model::Game {
         }
         if possible_move[0] == "SEED" {
             let source_idx = parse_input!(possible_move[1], i8);
-            let target_idx = parse_input!(possible_move[1], i8);
+            let target_idx = parse_input!(possible_move[2], i8);
             seeds.push(model::Action::SEED(source_idx, target_idx));
         }
         if possible_move[0] == "COMPLETE" {

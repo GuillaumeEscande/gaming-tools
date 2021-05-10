@@ -11,22 +11,23 @@ fn main() {
     loop {
         // Build game
         let mut game = init::init_game(&id_mapping);
+        eprintln!("---------- START TURN ----------");
 
-        eprintln!("{:?}", game);
+        game.print();
+
         let mut used_sun = 0;
         
-        loop {
-            if used_sun < game.me.sun {
-                break;
-            }
+        eprintln!("Sun points : {}", game.me.sun);
+        if game.me.sun <= used_sun {
+            eprintln!("---------- WAIT ----------");
+            model::Action::WAIT("Tu va creuver".to_string()).print();
+        } else {
+            eprintln!("---------- CHOOSE ACTION ----------");
 
             let action = choose::choose1(&mut used_sun, &id_mapping, &board, &mut game);
 
             action.print();
-
-
-
         }
-        model::Action::WAIT("Tu va creuver".to_string()).print();
+
     }
 }

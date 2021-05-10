@@ -31,6 +31,12 @@ pub struct Case {
     pub richness: i8
 }
 
+use graph::model::Nodeable;
+use board::HexagonCase;
+use std::rc::Rc;
+
+
+
 use std::collections::HashMap;
 
 pub fn get_id_mapping() -> HashMap<i16, Vec<i16>> {
@@ -100,5 +106,46 @@ pub struct Game {
     pub me: Player,
     pub opp: Player,
     pub actions: Actions,
-    pub trees: Vec<Tree>
+    pub trees: Vec<Option<Tree>>
+}
+
+impl Game{
+    pub fn print(&self){
+        eprintln!("Day : {}", self.day);
+        eprintln!("Nutrients : {}", self.nutrients);
+        eprintln!("Me : ");
+        eprintln!("  sun : {}", self.me.sun);
+        eprintln!("  score : {}", self.me.score);
+        eprintln!("  is_asleep : {}", self.me.is_asleep);
+        eprintln!("Opp : ");
+        eprintln!("  sun : {}", self.me.sun);
+        eprintln!("  score : {}", self.me.score);
+        eprintln!("  is_asleep : {}", self.me.is_asleep);
+        eprintln!("Actions :");
+        eprintln!("  Completes :");
+        for action in &self.actions.completes {
+            eprintln!("    - {:?}", action);
+        }
+        eprintln!("  Grows :");
+        for action in &self.actions.grows {
+            eprintln!("    - {:?}", action);
+        }
+        eprintln!("  Seeds :");
+        for action in &self.actions.seeds {
+            eprintln!("    - {:?}", action);
+        }
+        eprintln!("Trees :");
+        for tree in &self.trees {
+            match tree {
+                Some(treev) => {
+                    eprintln!("  - id = {}", treev.id_case);
+                    eprintln!("    coord = {:?}", treev.coord);
+                    eprintln!("    size = {}", treev.size);
+                    eprintln!("    is_mine = {}", treev.is_mine);
+                    eprintln!("    is_dormant = {}", treev.is_dormant);
+                }
+                None    => {},
+            }
+        }
+    }
 }
