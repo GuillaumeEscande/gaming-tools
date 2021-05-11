@@ -224,7 +224,7 @@ impl< T : 'static + Eq + PartialEq + Sized + Clone + Debug + Hash > LinearHexago
 
         let mut values_case : Vec<Rc<dyn BoardCase<T>>> = Vec::with_capacity(size);
 
-        for i in 0..size-1{
+        for i in 0..size{
             values_case.push(Rc::new(LinearHexagonCase::<T>{
                 id: i as i16,
                 case: Rc::clone(&values[i])
