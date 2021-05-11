@@ -45,21 +45,21 @@ do
     echo "pub mod $LIB{" >> "${OUTPUT_SRC}"
     for file in $(ls ./lib/$LIB/src/*.rs)
     do
-        filename=$(basename -- "$file")
-        filename="${filename%.*}"
-        echo "pub mod $filename{" >> "${OUTPUT_SRC}"
+        #filename=$(basename -- "$file")
+        #filename="${filename%.*}"
+        #echo "pub mod $filename{" >> "${OUTPUT_SRC}"
         echo "use super::*;" >> "${OUTPUT_SRC}"
         cat $file >> "${OUTPUT_SRC}"
-        echo "}" >> "${OUTPUT_SRC}"
+        #echo "}" >> "${OUTPUT_SRC}"
     done
     echo "}" >> "${OUTPUT_SRC}"
 
-    for file in $(ls ./lib/$LIB/src/*.rs)
-    do
-        filename=$(basename -- "$file")
-        filename="${filename%.*}"
-        echo "use $LIB::${filename}::*;" >> "${OUTPUT_SRC}"
-    done
+    #for file in $(ls ./lib/$LIB/src/*.rs)
+    #do
+    #    filename=$(basename -- "$file")
+    #    filename="${filename%.*}"
+    #    echo "use $LIB::${filename}::*;" >> "${OUTPUT_SRC}"
+    #done
 done
 
 
@@ -77,16 +77,16 @@ do
     fi
 done
 
-for LIB in ${LIBS[@]}
-do
-    sed -i "s|^use $LIB.*||g" "${OUTPUT_SRC}"
-    for file in $(ls ./lib/$LIB/src/*.rs)
-    do
-        filename=$(basename -- "$file")
-        filename="${filename%.*}"
-        echo "use $LIB::${filename}::*;" >> "${OUTPUT_SRC}"
-    done
-done
+#for LIB in ${LIBS[@]}
+#do
+    #sed -i "s|^use $LIB.*||g" "${OUTPUT_SRC}"
+    #for file in $(ls ./lib/$LIB/src/*.rs)
+    #do
+    #    filename=$(basename -- "$file")
+    #    filename="${filename%.*}"
+    #    echo "use $LIB::${filename}::*;" >> "${OUTPUT_SRC}"
+    #done
+#done
 
 for file in $(ls ./src/${SRC}/src/*.rs)
 do
