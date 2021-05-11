@@ -36,7 +36,6 @@ pub fn choose1(
                 better_cases_tree.push(true);
             },
             None    => {
-                eprintln!("TEST 01  case {} = {}", better_case, board.get(&vec!(*better_case)).get_value().richness);
                 if board.get(&vec!(*better_case)).get_value().richness == 0 {
                     better_cases_tree.push(true);                    
                 } else {
@@ -69,6 +68,7 @@ pub fn choose1(
                         if better_cases.contains(&case) {
                             eprintln!("---- complete on better_case {}", case);
                             complete.print();
+                            return;
                         }
                     },
                     _ => {}
@@ -76,7 +76,7 @@ pub fn choose1(
             }
         }
         eprintln!("-- Run first complete");
-        if game.me.sun >= 4 {
+        if game.me.sun >= 4 && game.day > 19 {
             let action = game.actions.completes.remove(0);
             eprintln!("---- Run compete {:?}", action);
             action.print();
@@ -113,7 +113,7 @@ pub fn choose1(
 
 
     eprintln!("-- Seed better_case");
-    if game.me.sun >= seed_cost {
+    if game.me.sun >= seed_cost /*&& nb_tree[0] < 3 && nb_tree[1] < 5*/ && game.day > 2 && game.day < 10 {
         eprintln!("---- find the nearest case to seed");
         let mut better_seed_action : i16 = -1;
         let mut nearest_target_distance : i16 = i16::MAX;
@@ -152,13 +152,33 @@ pub fn choose1(
         eprintln!("---- Seed to expensive {}", seed_cost);
     }
 
+
     // Third Action - growing tree
-    if game.actions.grows.len() > 1 {
-        eprintln!("-- Last chance : Last Action");
-        let action = game.actions.grows.pop().unwrap();
-        eprintln!("---- Run {:?}", action);
-        action.print();
-        return;
+    if game.actions.grows.len() > 1 && ( game.day < 4 || game.day > 15 || nb_tree[0] > 2 || nb_tree[1] > 2) {
+        let mut grow_value = 0;
+        let mut grow_id = 0;
+        for i in 0..game.actions.grows.len() {
+            match &game.actions.grows[i] {
+                model::Action::GROW(case) => {
+                    if game.trees[*case as usize].as_ref().unwrap().size > grow_value {
+                        grow_value = game.trees[*case as usize].as_ref().unwrap().size;
+                        grow_id = i;
+                    }
+                },
+                _ => {}
+            }
+        }
+        eprintln!("-- Last chance : Last Action"); if game.day > 15 {
+            let action = game.actions.grows.remove(grow_id);
+            eprintln!("---- Run {:?}", action);
+            action.print();
+            return;
+            } else {
+            let action = game.actions.grows.remove(0);
+            eprintln!("---- Run {:?}", action);
+            action.print();
+            return;
+            }
     }
    model::Action::WAIT("Je ne sais pas quoi faire".to_string()).print();
 

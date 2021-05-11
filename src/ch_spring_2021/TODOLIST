@@ -1,0 +1,12 @@
+// Faire une gestion de l'état poura voir plusieurs phases :
+//  - Collecte de points
+//  - épandage
+//  - Croissance
+//  - Complete
+
+// Faire un méthode de grow qui selectionne l'arbre pour avoir un équilibre entre chaque phase
+
+// Faire un séléction des meilleure case pour selectionner les case les plus isolé possible
+
+
+
