@@ -213,7 +213,7 @@ impl< T : Eq + PartialEq + Sized + Clone + Hash + Debug > BoardCase< T > for Lin
 
 #[derive(Debug)]
 pub struct LinearHexagon< T : Eq + PartialEq + Sized + Debug + Hash > {
-    size: usize,
+    pub size: usize,
     values: Vec<Rc<dyn BoardCase<T>>>,
     neighbors: Vec<Vec<i16>>,
     positions: Vec<Vec<i16>>

@@ -13,7 +13,7 @@ fn main() {
     // game loop
     loop {
         // Build game
-        let mut game = init::init_game();
+        let mut game = init::init_game(board.size as i16);
         eprintln!("---------- START TURN ----------");
 
         game.print();

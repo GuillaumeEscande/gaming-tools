@@ -46,7 +46,7 @@ pub fn init_board( id_mapping: &Vec<Vec<i16>> ) -> LinearHexagon::<model::Case> 
 
 }
 
-pub fn init_game() -> model::Game {
+pub fn init_game(number_of_case: i16) -> model::Game {
 
 
     let mut input_line = String::new();
@@ -73,7 +73,7 @@ pub fn init_game() -> model::Game {
     let opp : model::Player = model::Player{sun:opp_sun, score:opp_score, is_asleep:opp_is_waiting != 0};
 
     let number_of_trees = parse_input!(input_line, i32); // the current amount of trees
-    let mut trees : Vec<Option<model::Tree>> = vec![None; 37];
+    let mut trees : Vec<Option<model::Tree>> = vec![None; number_of_case as usize];
     for _i in 0..number_of_trees as usize {
         let mut input_line = String::new();
         io::stdin().read_line(&mut input_line).unwrap();

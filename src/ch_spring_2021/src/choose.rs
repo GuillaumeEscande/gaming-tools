@@ -36,7 +36,12 @@ pub fn choose1(
                 better_cases_tree.push(true);
             },
             None    => {
-                better_cases_tree.push(false);
+                eprintln!("TEST 01  case {} = {}", better_case, board.get(&vec!(*better_case)).get_value().richness);
+                if board.get(&vec!(*better_case)).get_value().richness == 0 {
+                    better_cases_tree.push(true);                    
+                } else {
+                    better_cases_tree.push(false);
+                }
             }
         }
     }
@@ -44,11 +49,12 @@ pub fn choose1(
     let grow_cost = vec!(1 + nb_tree[1], 3 + nb_tree[1], 7 + nb_tree[1], 0);
 
     eprintln!("-- CHOOSE PARAMS : ");
-    eprintln!("-- - sun restant = {}", game.me.sun);
-    eprintln!("-- - better_cases = {:?}", better_cases);
-    eprintln!("-- - seed_cost = {}", seed_cost);
-    eprintln!("-- - nb_tree = {:?}", nb_tree);
-    eprintln!("-- - grow_cost = {:?}", grow_cost);
+    eprintln!("-- - sun restant          = {}", game.me.sun);
+    eprintln!("-- - better_cases         = {:?}", better_cases);
+    eprintln!("-- - better_cases_tree    = {:?}", better_cases_tree);
+    eprintln!("-- - seed_cost            = {}", seed_cost);
+    eprintln!("-- - nb_tree              = {:?}", nb_tree);
+    eprintln!("-- - grow_cost            = {:?}", grow_cost);
 
 
 
@@ -111,7 +117,7 @@ pub fn choose1(
         eprintln!("---- find the nearest case to seed");
         let mut better_seed_action : i16 = -1;
         let mut nearest_target_distance : i16 = i16::MAX;
-        for i in 0..better_cases.len()-1 {
+        for i in 0..better_cases.len() {
             eprintln!("---- find the nearest case to seed");
             if !better_cases_tree[i] {
                 let case_indice = better_cases[i];
