@@ -14,7 +14,7 @@ macro_rules! parse_input {
 pub fn init_board( id_mapping: &Vec<Vec<i16>> ) -> LinearHexagon::<model::Case> {
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
-    let number_of_cells = parse_input!(input_line, i32); // 37
+    let number_of_cells = parse_input!(input_line, i16); // 37
     let mut neighbors : Vec<Vec<i16>> = Vec::with_capacity(number_of_cells as usize);
     let mut richnesses : Vec<Rc<model::Case>> = Vec::with_capacity(number_of_cells as usize);
     for _i in 0..number_of_cells as usize {
@@ -51,28 +51,28 @@ pub fn init_game(number_of_case: i16) -> model::Game {
 
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
-    let day = parse_input!(input_line, i32); // the game lasts 24 days: 0-23
+    let day = parse_input!(input_line, i16); // the game lasts 24 days: 0-23
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
-    let nutrients = parse_input!(input_line, i32); // the base score you gain from the next COMPLETE action
-    let mut input_line = String::new();
-    io::stdin().read_line(&mut input_line).unwrap();
-    let inputs = input_line.split(" ").collect::<Vec<_>>();
-    let sun = parse_input!(inputs[0], i32); // your sun points
-    let score = parse_input!(inputs[1], i32); // your current score
+    let nutrients = parse_input!(input_line, i16); // the base score you gain from the next COMPLETE action
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let inputs = input_line.split(" ").collect::<Vec<_>>();
-    let opp_sun = parse_input!(inputs[0], i32); // opponent's sun points
-    let opp_score = parse_input!(inputs[1], i32); // opponent's score
-    let opp_is_waiting = parse_input!(inputs[2], i32); // whether your opponent is asleep until the next day
+    let sun = parse_input!(inputs[0], i16); // your sun points
+    let score = parse_input!(inputs[1], i16); // your current score
+    let mut input_line = String::new();
+    io::stdin().read_line(&mut input_line).unwrap();
+    let inputs = input_line.split(" ").collect::<Vec<_>>();
+    let opp_sun = parse_input!(inputs[0], i16); // opponent's sun points
+    let opp_score = parse_input!(inputs[1], i16); // opponent's score
+    let opp_is_waiting = parse_input!(inputs[2], i16); // whether your opponent is asleep until the next day
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
 
     let me : model::Player = model::Player{sun:sun, score:score, is_asleep:false};
     let opp : model::Player = model::Player{sun:opp_sun, score:opp_score, is_asleep:opp_is_waiting != 0};
 
-    let number_of_trees = parse_input!(input_line, i32); // the current amount of trees
+    let number_of_trees = parse_input!(input_line, i16); // the current amount of trees
     let mut trees : Vec<Option<model::Tree>> = vec![None; number_of_case as usize];
     for _i in 0..number_of_trees as usize {
         let mut input_line = String::new();
@@ -80,8 +80,8 @@ pub fn init_game(number_of_case: i16) -> model::Game {
         let inputs = input_line.split(" ").collect::<Vec<_>>();
         let cell_index = parse_input!(inputs[0], i16); // location of this tree
         let size = parse_input!(inputs[1], i16); // size of this tree: 0-3
-        let is_mine = parse_input!(inputs[2], i32); // 1 if this is your tree
-        let is_dormant = parse_input!(inputs[3], i32); // 1 if this tree is dormant
+        let is_mine = parse_input!(inputs[2], i16); // 1 if this is your tree
+        let is_dormant = parse_input!(inputs[3], i16); // 1 if this tree is dormant
         trees[cell_index as usize] = Some(model::Tree{
             id_case:cell_index,
             size:size,
@@ -92,7 +92,7 @@ pub fn init_game(number_of_case: i16) -> model::Game {
 
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
-    let number_of_possible_moves = parse_input!(input_line, i32);
+    let number_of_possible_moves = parse_input!(input_line, i16);
 
     let mut completes: Vec<model::Action> = Vec::<model::Action>::new();
     let mut grows: Vec<model::Action> = Vec::<model::Action>::new();
@@ -135,4 +135,34 @@ pub fn init_game(number_of_case: i16) -> model::Game {
     return game;
 
 
+}
+
+pub fn init_param(
+    board: &LinearHexagon::<model::Case>,
+    game : &model::Game,) -> model::Params{
+
+    let mut nb_tree = vec!(0, 0, 0, 0);
+    let mut my_tree : Vec<model::Tree> = Vec::with_capacity(game.trees.len());
+    for tree_opt in &game.trees {
+        match tree_opt{
+            Some(tree) => {
+                if tree.is_mine {
+                    nb_tree[tree.size as usize] += 1;
+                    my_tree.push(tree.clone());
+                }
+            },
+            None    => {}
+        }
+    }
+    let seed_cost = nb_tree[0];
+
+
+    let grow_cost = vec!(1 + nb_tree[1], 3 + nb_tree[1], 7 + nb_tree[1], 0);
+
+    return model::Params{
+      nb_tree: nb_tree,
+      my_tree: my_tree,
+      seed_cost: seed_cost,
+      grow_cost: grow_cost,
+    };
 }

@@ -87,19 +87,28 @@ pub struct Tree {
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub struct Player {
-    pub sun: i32,
-    pub score: i32,
+    pub sun: i16,
+    pub score: i16,
     pub is_asleep: bool
 }
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub struct Game {
-    pub day: i32,
-    pub nutrients: i32,
+    pub day: i16,
+    pub nutrients: i16,
     pub me: Player,
     pub opp: Player,
     pub actions: Actions,
     pub trees: Vec<Option<Tree>>
+
+}
+
+#[derive(Eq,PartialEq,Debug,Clone,Hash)]
+pub struct Params {
+    pub nb_tree: Vec<i16>,
+    pub my_tree: Vec<Tree>,
+    pub seed_cost: i16,
+    pub grow_cost: Vec<i16>,
 }
 
 impl Game{
