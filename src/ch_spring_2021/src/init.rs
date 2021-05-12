@@ -2,7 +2,7 @@ use std::io;
 use crate::model;
 use board::Board;
 use board::BoardCase;
-use board::LinearHexagon;
+use crate::linear_hexagon;
 use std::rc::Rc;
 
 #[warn(unused_macros)]
@@ -11,7 +11,7 @@ macro_rules! parse_input {
 }
 
 
-pub fn init_board( id_mapping: &Vec<Vec<i16>> ) -> LinearHexagon::<model::Case> {
+pub fn init_board() -> linear_hexagon::LinearHexagon::<model::Case> {
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let number_of_cells = parse_input!(input_line, i16); // 37
@@ -36,11 +36,10 @@ pub fn init_board( id_mapping: &Vec<Vec<i16>> ) -> LinearHexagon::<model::Case> 
         neighbors.push(neighbor);
     }
 
-    let mut board : LinearHexagon::<model::Case> = LinearHexagon::<model::Case>::new(
+    let mut board : linear_hexagon::LinearHexagon::<model::Case> = linear_hexagon::LinearHexagon::<model::Case>::new(
         number_of_cells as usize,
         &richnesses,
         &neighbors,
-        id_mapping,
     );
     return board;
 
@@ -138,7 +137,7 @@ pub fn init_game(number_of_case: i16) -> model::Game {
 }
 
 pub fn init_param(
-    board: &LinearHexagon::<model::Case>,
+    board: &linear_hexagon::LinearHexagon::<model::Case>,
     game : &model::Game,) -> model::Params{
 
     let mut nb_tree = vec!(0, 0, 0, 0);

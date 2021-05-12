@@ -31,52 +31,6 @@ pub struct Case {
     pub richness: i16
 }
 
-use std::vec::Vec;
-
-pub fn get_id_mapping() -> Vec<Vec<i16>> {
-    let mut id_maping = Vec::with_capacity(37);
-
-    id_maping.push(vec!( 0,  0,  0));
-    id_maping.push(vec!( 1, -1,  0));
-    id_maping.push(vec!( 1,  0, -1));
-    id_maping.push(vec!( 0,  1, -1));
-    id_maping.push(vec!(-1,  1,  0));
-    id_maping.push(vec!(-1,  0,  1));
-    id_maping.push(vec!( 0, -1,  1));
-    id_maping.push(vec!( 2, -2,  0));
-    id_maping.push(vec!( 2, -1, -1));
-    id_maping.push(vec!( 2,  0, -2));
-    id_maping.push(vec!( 1,  1, -2));
-    id_maping.push(vec!( 0,  2, -2));
-    id_maping.push(vec!(-1,  2, -1));
-    id_maping.push(vec!(-2,  2,  0));
-    id_maping.push(vec!(-2,  1,  1));
-    id_maping.push(vec!(-2,  0,  2));
-    id_maping.push(vec!(-1, -1,  2));
-    id_maping.push(vec!( 0, -2,  2));
-    id_maping.push(vec!( 1, -2,  1));
-    id_maping.push(vec!( 3, -3,  0));
-    id_maping.push(vec!( 3, -2, -1));
-    id_maping.push(vec!( 3, -1, -2));
-    id_maping.push(vec!( 3,  0, -3));
-    id_maping.push(vec!( 2,  1, -3));
-    id_maping.push(vec!( 1,  2, -3));
-    id_maping.push(vec!( 0,  3, -3));
-    id_maping.push(vec!(-1,  3, -2));
-    id_maping.push(vec!(-2,  3, -1));
-    id_maping.push(vec!(-3,  3,  0));
-    id_maping.push(vec!(-3,  2,  1));
-    id_maping.push(vec!(-3,  1,  2));
-    id_maping.push(vec!(-3,  0,  3));
-    id_maping.push(vec!(-2, -1,  3));
-    id_maping.push(vec!(-1, -2,  3));
-    id_maping.push(vec!( 0, -3,  3));
-    id_maping.push(vec!( 1, -3,  2));
-    id_maping.push(vec!( 2, -3,  1));
-
-    return id_maping;
-}
-
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub struct Tree {
     pub id_case: i16,

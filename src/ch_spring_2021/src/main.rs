@@ -5,12 +5,14 @@ mod prepare;
 mod complete;
 mod grow;
 mod seed;
+mod constant;
+mod linear_hexagon;
 use std::vec::Vec;
+
 
 fn main() {
     // Init data
-    let id_mapping = model::get_id_mapping();
-    let board = init::init_board(&id_mapping);
+    let board = init::init_board();
 
     let better_cases : Vec<i16> = prepare::sort_better_cases(&board);
 

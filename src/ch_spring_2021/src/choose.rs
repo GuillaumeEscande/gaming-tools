@@ -1,4 +1,4 @@
-use board::LinearHexagon;
+use crate::linear_hexagon;
 use board::Board;
 use crate::model;
 use crate::complete;
@@ -6,7 +6,7 @@ use crate::seed;
 use crate::grow;
 
 pub fn choose1(
-    board: &LinearHexagon::<model::Case>,
+    board: &linear_hexagon::LinearHexagon::<model::Case>,
     game : &mut model::Game,
     params : &model::Params,
     better_cases: &Vec<i16> ) -> () {

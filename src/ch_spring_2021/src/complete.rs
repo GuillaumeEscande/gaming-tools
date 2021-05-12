@@ -1,9 +1,9 @@
-use board::LinearHexagon;
+use crate::linear_hexagon;
 use board::Board;
 use crate::model;
 
 pub fn extract_complete(
-    board: &LinearHexagon::<model::Case>,
+    board: &linear_hexagon::LinearHexagon::<model::Case>,
     game : &mut model::Game,
     params : &model::Params,
     better_cases: &Vec<i16> ) -> Option<model::Action> {

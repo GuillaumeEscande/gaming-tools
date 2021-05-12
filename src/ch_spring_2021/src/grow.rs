@@ -1,9 +1,9 @@
-use board::LinearHexagon;
+use crate::linear_hexagon;
 use board::Board;
 use crate::model;
 
 pub fn extract_seed_to_grow(
-    board: &LinearHexagon::<model::Case>,
+    board: &linear_hexagon::LinearHexagon::<model::Case>,
     game : &mut model::Game,
     params : &model::Params,
     better_cases: &Vec<i16> ) -> Option<model::Action> {
@@ -31,7 +31,7 @@ pub fn extract_seed_to_grow(
 
 
 pub fn extract_grow(
-    board: &LinearHexagon::<model::Case>,
+    board: &linear_hexagon::LinearHexagon::<model::Case>,
     game : &mut model::Game,
     params : &model::Params,
     better_cases: &Vec<i16> ) -> Option<model::Action> {

@@ -1,33 +1,37 @@
 
 all: test merge
 
-test: test_libs test_src
+test: libs src
 
-test_libs: test_board test_solver test_graph test_gamio test_logger
+libs: board solver graph gamio logger state
 
-test_board: 
+board: 
 	cd lib/board && \
 	cargo test
 
-test_graph: 
+graph: 
 	cd lib/graph && \
 	cargo test
 
-test_solver: 
+solver: 
 	cd lib/solver && \
 	cargo test
 
-test_gamio: 
+gamio: 
 	cd lib/gamio && \
 	cargo test
 
-test_logger: 
+logger: 
 	cd lib/logger && \
 	cargo test
 
-test_src: test_ch_sring_2021
+state: 
+	cd lib/state && \
+	cargo test
 
-test_ch_sring_2021:
+src: ch_sring_2021
+
+ch_sring_2021:
 	cd src/ch_spring_2021 && \
 	cargo test
 
@@ -35,7 +39,7 @@ merge: merge_ch_sring_2021
 
 merge_ch_sring_2021:
 	mkdir -p target
-	./tools/merger.sh -l board -l graph -l gamio -l logger -o ./target ch_spring_2021
+	./tools/merger.sh -l board -l graph -l gamio -l logger -l state -o ./target ch_spring_2021
 	cd target && \
 	cargo test
 	

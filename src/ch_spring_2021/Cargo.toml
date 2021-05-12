@@ -12,3 +12,4 @@ board = { path = "../../lib/board" }
 game = { path = "../../lib/game" }
 logger = { path = "../../lib/logger" }
 gamio = { path = "../../lib/gamio" }
+state = { path = "../../lib/state" }
