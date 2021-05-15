@@ -1,5 +1,6 @@
 use std::io;
 use crate::model;
+use crate::simu;
 use game::Game;
 use board::Board;
 use board::BoardCase;
@@ -27,6 +28,7 @@ pub fn init_board() -> Rc<linearhexagon::LinearHexagon::<model::Case>> {
         let richness = parse_input!(inputs[1], i16); // 0 if the cell is unusable, 1-3 for usable cells
         richnesses.push(Rc::new(model::Case{
             richness: richness,
+            shadow: 0,
             tree: None
         }));
         let mut neighbor : Vec<i16> = Vec::with_capacity(6);
@@ -119,7 +121,7 @@ pub fn init_game(board: &Rc<linearhexagon::LinearHexagon::<model::Case>> ) -> mo
         }
     }
 
-    // Todo update board with tree and shadow
+    // TODO update board with tree and shadow
     let game : model::TreeGame = model::TreeGame{
         board: Rc::clone(board),
         day:day,

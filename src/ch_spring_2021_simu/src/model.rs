@@ -1,8 +1,8 @@
 use board::Board;
 use linearhexagon::LinearHexagon;
 use game::Game;
-    use std::rc::Rc;
-    use std::collections::LinkedList;
+use std::rc::Rc;
+use std::collections::LinkedList;
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub enum Action {
@@ -27,6 +27,7 @@ impl Action {
 #[derive(Eq,PartialEq,Debug,Clone)]
 pub struct Case {
     pub richness: i16,
+    pub shadow: i16,
     pub tree: Option<Rc<Tree>>
 }
 
@@ -64,19 +65,19 @@ pub struct Params {
 
 
 
+impl game::Game<model::Case, linearhexagon::LinearHexagonCase<model::Case>, model::Player, linearhexagon::LinearHexagon<model::Case>, model::Action> for TreeGame{
 
-
-impl game::Game<Case, linearhexagon::LinearHexagonCase<Case>, Player, linearhexagon::LinearHexagon<Case>, Action> for TreeGame{
-
-    fn board(&self) -> Rc<linearhexagon::LinearHexagon<Case>>{
+    fn board(&self) -> Rc<linearhexagon::LinearHexagon<model::Case>>{
         return Rc::clone(&self.board);
     }
-    fn actions(&self) -> LinkedList< Action >{
+    fn actions(&self) -> LinkedList< model::Action >{
         let mut actions = LinkedList::new();
 
-        
+        actions.push_back(model::Action::WAIT("".to_string()));
 
-        actions.push_back(Action::WAIT("".to_string()));
+        // TODO faire SEED
+        // TODO faire COMPLETE
+
 
         return actions;
     }
@@ -86,10 +87,10 @@ impl game::Game<Case, linearhexagon::LinearHexagonCase<Case>, Player, linearhexa
     fn is_terminal(&self) -> bool{
         return true;
     }
-    fn apply(&self, action: &Action) -> Rc<Self>{
+    fn apply(&self, action: &model::Action) -> Rc<Self>{
         return Rc::new(self.clone());
     }
-    fn me(&self) -> &Player{
+    fn me(&self) -> &model::Player{
         return &self.me;
     }
 }
