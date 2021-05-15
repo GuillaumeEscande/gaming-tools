@@ -48,9 +48,9 @@ pub fn init_board() -> Rc<linearhexagon::LinearHexagon::<model::Case>> {
 
 }
 
-pub fn init_game(number_of_case: i16, board: Rc<linearhexagon::LinearHexagon::<model::Case>> ) -> model::TreeGame {
+pub fn init_game(board: &Rc<linearhexagon::LinearHexagon::<model::Case>> ) -> model::TreeGame {
 
-
+    let number_of_case = board.size as i16;
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let day = parse_input!(input_line, i16); // the game lasts 24 days: 0-23
@@ -119,10 +119,9 @@ pub fn init_game(number_of_case: i16, board: Rc<linearhexagon::LinearHexagon::<m
         }
     }
 
-    let new_board = Rc::new((*board).clone());
     // Todo update board with tree and shadow
     let game : model::TreeGame = model::TreeGame{
-        board: new_board,
+        board: Rc::clone(board),
         day:day,
         nutrients:nutrients,
         me:me,
@@ -140,9 +139,7 @@ pub fn init_game(number_of_case: i16, board: Rc<linearhexagon::LinearHexagon::<m
 
 }
 
-pub fn init_param(
-    board: &LinearHexagon::<model::Case>,
-    game : &model::TreeGame) -> model::Params{
+pub fn init_param( game : &model::TreeGame) -> model::Params{
 
     let mut nb_tree = vec!(0, 0, 0, 0);
     let mut my_trees : Vec<Rc<model::Tree>> = Vec::with_capacity(game.trees.len());
