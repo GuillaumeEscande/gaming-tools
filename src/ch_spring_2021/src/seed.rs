@@ -1,6 +1,8 @@
 use crate::linear_hexagon;
-use board::Board;
 use crate::model;
+use crate::constant;
+use board::Board;
+ 
 
 pub fn get_nearest_case_to_seed (
     board: &linear_hexagon::LinearHexagon::<model::Case>,

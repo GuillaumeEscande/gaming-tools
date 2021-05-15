@@ -1,6 +1,7 @@
 use crate::linear_hexagon;
-use board::Board;
 use crate::model;
+use crate::constant;
+use board::Board;
 
 pub fn extract_seed_to_grow(
     board: &linear_hexagon::LinearHexagon::<model::Case>,

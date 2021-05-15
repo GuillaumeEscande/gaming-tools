@@ -4,13 +4,13 @@ use crate::model;
 use crate::complete;
 use crate::seed;
 use crate::grow;
+use crate::constant;
 
 pub fn choose1(
     board: &linear_hexagon::LinearHexagon::<model::Case>,
     game : &mut model::Game,
     params : &model::Params,
-    better_cases: &Vec<i16> ) -> () {
-
+    better_cases: &Vec<i16>) -> () {
 
 
     eprintln!("-- CHOOSE PARAMS : ");
@@ -19,7 +19,10 @@ pub fn choose1(
     eprintln!("-- - params            = {:?}", params);
 
 
+    
 
+    //if game.actions.completes.len() > 0 {
+    //    if game.me.sun >= params.seed_cost + 4 {
 
     let complete : Option<model::Action> = complete::extract_complete( board, game, params,better_cases );
 

@@ -53,8 +53,7 @@ pub struct Game {
     pub me: Player,
     pub opp: Player,
     pub actions: Actions,
-    pub trees: Vec<Option<Tree>>
-
+    pub trees: Vec<Option<Tree>>,
 }
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]

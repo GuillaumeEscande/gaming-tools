@@ -1,9 +1,11 @@
 use std::io;
 use crate::model;
+use game::Game;
 use board::Board;
 use board::BoardCase;
-use crate::linear_hexagon;
+use linearhexagon::LinearHexagon;
 use std::rc::Rc;
+use std::collections::LinkedList;
 
 #[warn(unused_macros)]
 macro_rules! parse_input {
@@ -11,7 +13,7 @@ macro_rules! parse_input {
 }
 
 
-pub fn init_board() -> linear_hexagon::LinearHexagon::<model::Case> {
+pub fn init_board() -> Rc<linearhexagon::LinearHexagon::<model::Case>> {
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let number_of_cells = parse_input!(input_line, i16); // 37
@@ -24,7 +26,8 @@ pub fn init_board() -> linear_hexagon::LinearHexagon::<model::Case> {
         let index = parse_input!(inputs[0], i16); // 0 is the center cell, the next cells spiral outwards
         let richness = parse_input!(inputs[1], i16); // 0 if the cell is unusable, 1-3 for usable cells
         richnesses.push(Rc::new(model::Case{
-            richness: richness
+            richness: richness,
+            tree: None
         }));
         let mut neighbor : Vec<i16> = Vec::with_capacity(6);
         for i in 2..8 {
@@ -36,16 +39,16 @@ pub fn init_board() -> linear_hexagon::LinearHexagon::<model::Case> {
         neighbors.push(neighbor);
     }
 
-    let mut board : linear_hexagon::LinearHexagon::<model::Case> = linear_hexagon::LinearHexagon::<model::Case>::new(
+    let mut board = Rc::new(linearhexagon::LinearHexagon::<model::Case>::new(
         number_of_cells as usize,
         &richnesses,
         &neighbors,
-    );
+    ));
     return board;
 
 }
 
-pub fn init_game(number_of_case: i16) -> model::Game {
+pub fn init_game(number_of_case: i16, board: Rc<linearhexagon::LinearHexagon::<model::Case>> ) -> model::TreeGame {
 
 
     let mut input_line = String::new();
@@ -72,30 +75,27 @@ pub fn init_game(number_of_case: i16) -> model::Game {
     let opp : model::Player = model::Player{sun:opp_sun, score:opp_score, is_asleep:opp_is_waiting != 0};
 
     let number_of_trees = parse_input!(input_line, i16); // the current amount of trees
-    let mut trees : Vec<Option<model::Tree>> = vec![None; number_of_case as usize];
+    let mut trees : Vec<Option<Rc<model::Tree>>> = vec![None; number_of_case as usize];
     for _i in 0..number_of_trees as usize {
         let mut input_line = String::new();
         io::stdin().read_line(&mut input_line).unwrap();
         let inputs = input_line.split(" ").collect::<Vec<_>>();
-        let cell_index = parse_input!(inputs[0], i16); // location of this tree
+        let cell_index = parse_input!(inputs[0], usize); // location of this tree
         let size = parse_input!(inputs[1], i16); // size of this tree: 0-3
         let is_mine = parse_input!(inputs[2], i16); // 1 if this is your tree
         let is_dormant = parse_input!(inputs[3], i16); // 1 if this tree is dormant
-        trees[cell_index as usize] = Some(model::Tree{
-            id_case:cell_index,
+        trees[cell_index] = Some(Rc::new(model::Tree{
             size:size,
             is_mine:is_mine!=0,
             is_dormant:is_dormant!=0
-        });
+        }));
     }
 
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let number_of_possible_moves = parse_input!(input_line, i16);
 
-    let mut completes: Vec<model::Action> = Vec::<model::Action>::new();
-    let mut grows: Vec<model::Action> = Vec::<model::Action>::new();
-    let mut seeds: Vec<model::Action> = Vec::<model::Action>::new();
+    let mut read_actions: LinkedList<model::Action> = LinkedList::<model::Action>::new();
 
     for _i in 0..number_of_possible_moves as usize {
         let mut input_line = String::new();
@@ -103,33 +103,37 @@ pub fn init_game(number_of_case: i16) -> model::Game {
         let possible_move = input_line.trim_matches('\n').split(" ").collect::<Vec<_>>();
         if possible_move[0] == "GROW" {
             let grow = parse_input!(possible_move[1], i16);
-            grows.push(model::Action::GROW(grow));
+            read_actions.push_back(model::Action::GROW(grow));
         }
         if possible_move[0] == "SEED" {
             let source_idx = parse_input!(possible_move[1], i16);
             let target_idx = parse_input!(possible_move[2], i16);
-            seeds.push(model::Action::SEED(source_idx, target_idx));
+            read_actions.push_back(model::Action::SEED(source_idx, target_idx));
         }
         if possible_move[0] == "COMPLETE" {
             let cell_idx = parse_input!(possible_move[1], i16);
-            completes.push(model::Action::COMPLETE(cell_idx));
+            read_actions.push_back(model::Action::COMPLETE(cell_idx));
+        }
+        if possible_move[0] == "WAIT" {
+            read_actions.push_back(model::Action::WAIT("".to_string()));
         }
     }
 
-    let actions : model::Actions = model::Actions{
-        completes: completes,
-        grows: grows,
-        seeds: seeds,
-    };
-
-    let game : model::Game = model::Game{
+    let new_board = Rc::new((*board).clone());
+    // Todo update board with tree and shadow
+    let game : model::TreeGame = model::TreeGame{
+        board: new_board,
         day:day,
         nutrients:nutrients,
         me:me,
         opp:opp,
-        actions:actions,
         trees: trees
     };
+
+    let computed_actions = game.actions();
+    if computed_actions != read_actions {
+        eprintln!("Actions différentes !!!!!!!! \n read = {:?} \n computed = {:?}", read_actions, computed_actions)
+    }
 
     return game;
 
@@ -137,17 +141,18 @@ pub fn init_game(number_of_case: i16) -> model::Game {
 }
 
 pub fn init_param(
-    board: &linear_hexagon::LinearHexagon::<model::Case>,
-    game : &model::Game,) -> model::Params{
+    board: &LinearHexagon::<model::Case>,
+    game : &model::TreeGame) -> model::Params{
 
     let mut nb_tree = vec!(0, 0, 0, 0);
-    let mut my_tree : Vec<model::Tree> = Vec::with_capacity(game.trees.len());
+    let mut my_trees : Vec<Rc<model::Tree>> = Vec::with_capacity(game.trees.len());
     for tree_opt in &game.trees {
         match tree_opt{
             Some(tree) => {
-                if tree.is_mine {
-                    nb_tree[tree.size as usize] += 1;
-                    my_tree.push(tree.clone());
+                let local_tree = tree;
+                if local_tree.is_mine {
+                    nb_tree[local_tree.size as usize] += 1;
+                    my_trees.push(Rc::clone(tree));
                 }
             },
             None    => {}
@@ -160,7 +165,7 @@ pub fn init_param(
 
     return model::Params{
       nb_tree: nb_tree,
-      my_tree: my_tree,
+      my_trees: my_trees,
       seed_cost: seed_cost,
       grow_cost: grow_cost,
     };
