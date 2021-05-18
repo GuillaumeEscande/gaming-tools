@@ -17,6 +17,9 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > BoardCase< T > for LinearHexa
     fn get_value(&self)->&Rc<T>{
         return &self.value;
     }
+    fn get_mut_value(&mut self)->&mut Rc<T>{
+        return &mut self.value;
+    }
     fn set_value(&mut self, value : &Rc<T>){
         self.value = Rc::clone(value);
     }
@@ -116,8 +119,12 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > Board< T, LinearHexagonCase<T
         return vec!(self.size);
     }
 
-    fn get(&self, pos: &Vec<i16>)->Rc<LinearHexagonCase<T>>{
-        return Rc::clone(&self.values[pos[0] as usize]);
+    fn get(&self, pos: &Vec<i16>)->&Rc<LinearHexagonCase<T>>{
+        return &self.values[pos[0] as usize];
+    }
+
+    fn get_mut(&mut self, pos: &Vec<i16>)->&mut Rc<LinearHexagonCase<T>>{
+        return &mut self.values[pos[0] as usize];
     }
 
     fn print(&self){

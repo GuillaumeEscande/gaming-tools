@@ -14,22 +14,22 @@ pub trait Solvable : Clone + Debug + Eq + PartialEq + Sized {
 
 // Parcours en largeur
 pub fn breadth_first_search<T: Solvable + PartialEq>(
-    init_state: Rc<T>,
+    init_state: &Rc<T>,
     max_depth: i32) -> LinkedList< ( Rc<T>, i64 ) > {
     eprintln!("start of bfs, max deep {}", max_depth);
 
     let mut listed_states: LinkedList< ( Rc<T>, i64 ) > = LinkedList::new();
     let mut current_depth: VecDeque::< Rc::<T>> = VecDeque::new();
-    current_depth.push_back(init_state);
+    current_depth.push_back(Rc::clone(init_state));
 
     let mut depth: i32 = 0;
 
     while !current_depth.is_empty() && depth < max_depth {
         let mut next_deph : VecDeque::< Rc::< T > > = VecDeque::new();
         for current_state in &current_depth {
-            for next_state in &current_state.next_states()
+            for next_state in current_state.next_states()
             {
-                if listed_states.iter().find(|&x| &x.0 == next_state).is_none() {
+                if listed_states.iter().find(|&x| x.0 == next_state).is_none() {
                     next_deph.push_back( next_state.clone());
                     listed_states.push_back( ( next_state.clone(), next_state.value() ) );
                 }
@@ -42,18 +42,19 @@ pub fn breadth_first_search<T: Solvable + PartialEq>(
 }
 
 pub fn deep_search<T: Solvable + PartialEq>(
-    initial: Rc<T>) -> LinkedList< ( Rc<T>, i64 ) > {
+    initial: &Rc<T>) -> LinkedList< ( Rc<T>, i64 ) > {
 
     let mut listed_states: LinkedList< ( Rc<T>, i64 ) > = LinkedList::new();
-    let mut queue = VecDeque::new();
-    queue.push_front(initial);
+    let mut queue = VecDeque::<Rc::<T>>::new();
+    queue.push_front(Rc::clone(initial));
 
     while !queue.is_empty() {
         let current = queue.pop_front().unwrap();
         if listed_states.iter().find(|&x| x.0 == current).is_none() {
             listed_states.push_back( (current.clone(), current.value()) );
         }
-        for node in current.next_states() {
+        let next_state = current.next_states();
+        for node in next_state {
             queue.push_front(node);
         }
     }
@@ -62,18 +63,18 @@ pub fn deep_search<T: Solvable + PartialEq>(
 }
 
 #[derive(Clone, Eq, PartialEq, Debug)]
-struct GameSolvable <T : Eq + PartialEq + Sized + Clone + Debug,
+pub struct GameSolvable <T : Eq + PartialEq + Sized + Clone + Debug,
                      C : BoardCase<T>, 
                      P: Eq + PartialEq + Sized + Clone + Debug,
                      B: Board<T, C >,
                      A: Eq + PartialEq + Sized + Clone + Debug,
                      G : Game<T, C, P, B, A> >{
-    game : Rc<G>,
-    _phantom_t: PhantomData<T>,
-    _phantom_p: PhantomData<P>,
-    _phantom_b: PhantomData<B>,
-    _phantom_a: PhantomData<A>,
-    _phantom_c: PhantomData<C>,
+    pub game : Rc<G>,
+    pub _phantom_t: PhantomData<T>,
+    pub _phantom_p: PhantomData<P>,
+    pub _phantom_b: PhantomData<B>,
+    pub _phantom_a: PhantomData<A>,
+    pub _phantom_c: PhantomData<C>,
 }
 
 impl <  T : Eq + PartialEq + Sized + Clone + Debug,
@@ -88,15 +89,17 @@ impl <  T : Eq + PartialEq + Sized + Clone + Debug,
     }
     fn next_states(&self)->LinkedList< Rc<Self> >{
         let mut states = LinkedList::< Rc::<Self> >::new();
-        for action in self.game.actions(){
-            states.push_back(Rc::new(GameSolvable {
-                game: self.game.apply(&action),
-                _phantom_t: PhantomData,
-                _phantom_p: PhantomData,
-                _phantom_b: PhantomData,
-                _phantom_a: PhantomData,
-                _phantom_c: PhantomData,
-            }));
+        if ! &self.game.is_terminal() {
+            for action in self.game.actions(){
+                states.push_back(Rc::new(GameSolvable {
+                    game: self.game.apply(&action),
+                    _phantom_t: PhantomData,
+                    _phantom_p: PhantomData,
+                    _phantom_b: PhantomData,
+                    _phantom_a: PhantomData,
+                    _phantom_c: PhantomData,
+                }));
+            }
         }
         return states;
     }
@@ -131,7 +134,7 @@ mod tests {
         next1.push_back(node2);
         let node1 = Rc::new(DefaultSolvable { value: 15, next_states: next1.clone() });
 
-        let result: LinkedList< ( Rc<DefaultSolvable>, i64 ) > = deep_search(node1.clone());
+        let result: LinkedList< ( Rc<DefaultSolvable>, i64 ) > = deep_search(&node1);
         assert_eq!(result.len(), 2);
     }
 
@@ -142,13 +145,13 @@ mod tests {
         next1.push_back(node2.clone());
         let node1 = Rc::new(DefaultSolvable { value: 15, next_states: next1 });
 
-        let result: LinkedList< ( Rc<DefaultSolvable>, i64 ) > = breadth_first_search(node1.clone(), 0);
+        let result: LinkedList< ( Rc<DefaultSolvable>, i64 ) > = breadth_first_search(&node1, 0);
         assert_eq!(result.len(), 0);
 
-        let result: LinkedList< ( Rc<DefaultSolvable>, i64 ) > = breadth_first_search(node1.clone(), 1);
+        let result: LinkedList< ( Rc<DefaultSolvable>, i64 ) > = breadth_first_search(&node1, 1);
         assert_eq!(result.len(), 1);
 
-        let result: LinkedList< ( Rc<DefaultSolvable>, i64 ) > = breadth_first_search(node1.clone(), 2);
+        let result: LinkedList< ( Rc<DefaultSolvable>, i64 ) > = breadth_first_search(&node1, 2);
         assert_eq!(result.len(), 1);
     }
 }

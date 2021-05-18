@@ -3,6 +3,7 @@ use linearhexagon::LinearHexagon;
 use game::Game;
 use std::rc::Rc;
 use std::collections::LinkedList;
+use crate::actions;
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub enum Action {
@@ -64,33 +65,29 @@ pub struct Params {
 }
 
 
+impl game::Game<Case, linearhexagon::LinearHexagonCase<Case>, Player, linearhexagon::LinearHexagon<Case>, Action> for TreeGame{
 
-impl game::Game<model::Case, linearhexagon::LinearHexagonCase<model::Case>, model::Player, linearhexagon::LinearHexagon<model::Case>, model::Action> for TreeGame{
-
-    fn board(&self) -> Rc<linearhexagon::LinearHexagon<model::Case>>{
+    fn board(&self) -> Rc<linearhexagon::LinearHexagon<Case>>{
         return Rc::clone(&self.board);
     }
-    fn actions(&self) -> LinkedList< model::Action >{
-        let mut actions = LinkedList::new();
-
-        actions.push_back(model::Action::WAIT("".to_string()));
-
-        // TODO faire SEED
-        // TODO faire COMPLETE
-
-
-        return actions;
+    fn actions(&self) -> LinkedList< Action >{
+        return actions::compute_actions(&self);
     }
     fn score(&self) -> i64{
+        // TODO
         return 0;
     }
     fn is_terminal(&self) -> bool{
+        // TODO
         return true;
     }
-    fn apply(&self, action: &model::Action) -> Rc<Self>{
+    fn apply(&self, action: &Action) -> Rc<Self>{
+        // TODO
         return Rc::new(self.clone());
     }
-    fn me(&self) -> &model::Player{
+    fn me(&self) -> &Player{
         return &self.me;
     }
 }
+
+type TreeGameSolvable = solver::GameSolvable<Case, linearhexagon::LinearHexagonCase<Case>, Player, linearhexagon::LinearHexagon<Case>, Action, TreeGame>;

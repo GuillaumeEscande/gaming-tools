@@ -21,6 +21,9 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > BoardCase< T > for HexagonCas
     fn get_value(&self)->&Rc<T>{
         return &self.value;
     }
+    fn get_mut_value(&mut self)->&mut Rc<T>{
+        return &mut self.value;
+    }
     fn set_value(&mut self, value : &Rc<T>){
         self.value = Rc::clone(value);
     }
@@ -107,14 +110,21 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone> Board< T, HexagonCase< T > > f
         return vec!(self.size, self.size, self.size);
     }
 
-    fn get(&self, pos: &Vec<i16>)->Rc<HexagonCase< T >>{
+    fn get(&self, pos: &Vec<i16>)->&Rc<HexagonCase< T >>{
         let pos1 : usize = (pos[0] + self.size as i16) as usize;
         let pos2 : usize = (pos[1] + self.size as i16) as usize;
         let pos3 : usize = (pos[2] + self.size as i16) as usize;
 
-        return Rc::clone(&self.board[pos1][pos2][pos3]);
+        return &self.board[pos1][pos2][pos3];
     }
 
+    fn get_mut(&mut self, pos: &Vec<i16>)->&mut Rc<HexagonCase<T>>{
+        let pos1 : usize = (pos[0] + self.size as i16) as usize;
+        let pos2 : usize = (pos[1] + self.size as i16) as usize;
+        let pos3 : usize = (pos[2] + self.size as i16) as usize;
+
+        return &mut self.board[pos1][pos2][pos3];
+    }
     fn print(&self){
         /*
         let real_size = (1 + self.size * 2) as i16;

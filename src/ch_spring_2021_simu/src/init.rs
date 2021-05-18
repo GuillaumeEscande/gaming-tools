@@ -1,6 +1,5 @@
 use std::io;
 use crate::model;
-use crate::simu;
 use game::Game;
 use board::Board;
 use board::BoardCase;
@@ -50,9 +49,9 @@ pub fn init_board() -> Rc<linearhexagon::LinearHexagon::<model::Case>> {
 
 }
 
-pub fn init_game(board: &Rc<linearhexagon::LinearHexagon::<model::Case>> ) -> model::TreeGame {
+pub fn update_game(game: &mut Rc<model::TreeGame>) -> () {
 
-    let number_of_case = board.size as i16;
+    let number_of_case = game.board.size as i16;
     let mut input_line = String::new();
     io::stdin().read_line(&mut input_line).unwrap();
     let day = parse_input!(input_line, i16); // the game lasts 24 days: 0-23
@@ -120,28 +119,28 @@ pub fn init_game(board: &Rc<linearhexagon::LinearHexagon::<model::Case>> ) -> mo
             read_actions.push_back(model::Action::WAIT("".to_string()));
         }
     }
+    
+    let game_mut : &mut model::TreeGame = Rc::get_mut(game).unwrap();
+    game_mut.day = day;
+    game_mut.nutrients = nutrients;
+    game_mut.me = me;
+    game_mut.opp = opp;
+    game_mut.trees = trees;
 
-    // TODO update board with tree and shadow
-    let game : model::TreeGame = model::TreeGame{
-        board: Rc::clone(board),
-        day:day,
-        nutrients:nutrients,
-        me:me,
-        opp:opp,
-        trees: trees
-    };
-
-    let computed_actions = game.actions();
-    if computed_actions != read_actions {
-        eprintln!("Actions différentes !!!!!!!! \n read = {:?} \n computed = {:?}", read_actions, computed_actions)
+    let computed_actions : &LinkedList<model::Action> = &game.actions();
+    for action in computed_actions {
+        if ! read_actions.contains(&action) {
+            eprintln!("Action présente dans computed_actions mais pas dans read_actions : {:?}", action)
+        }
     }
-
-    return game;
-
-
+    for action in read_actions {
+        if ! computed_actions.contains(&action) {
+            eprintln!("Action présente dans read_actions mais pas dans computed_actions : {:?}", action)
+        }
+    }
 }
 
-pub fn init_param( game : &model::TreeGame) -> model::Params{
+pub fn init_param( game: &Rc<model::TreeGame> ) -> model::Params{
 
     let mut nb_tree = vec!(0, 0, 0, 0);
     let mut my_trees : Vec<Rc<model::Tree>> = Vec::with_capacity(game.trees.len());
