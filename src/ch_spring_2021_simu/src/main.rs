@@ -3,6 +3,7 @@ mod init;
 mod constant;
 mod tools;
 mod actions;
+mod simu;
 use std::rc::Rc;
 use solver::breadth_first_search;
 use solver::GameSolvable;
@@ -33,14 +34,14 @@ fn main() {
         tools::update_shadow(&mut game);
         eprintln!("---------- START TURN ----------");
 
-        find_solution(&game);
+        game = find_solution(&game);
 
         eprintln!("---------- CHOOSE ACTION ----------");
 
     }
 }
 
-pub fn find_solution(game : &Rc<model::TreeGame>){
+pub fn find_solution(game : &Rc<model::TreeGame>) -> Rc<model::TreeGame>{
     let gamesolver = solver::GameSolvable::<
         model::Case,
         linearhexagon::LinearHexagonCase::<model::Case>,
@@ -54,6 +55,8 @@ pub fn find_solution(game : &Rc<model::TreeGame>){
     _phantom_b: PhantomData,
     _phantom_a: PhantomData,
     _phantom_c: PhantomData };
-
-    solver::breadth_first_search(&Rc::new(gamesolver), 4);
+    
+    //solver::breadth_first_search(&Rc::new(gamesolver), 4);
+    solver::deep_search(&Rc::new(gamesolver));
+    return simu::simulate_turn(&Rc::new(game), &model::Action::WAIT("".to_string()))
 }

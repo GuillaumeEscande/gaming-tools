@@ -113,6 +113,7 @@ perl -i -0pe 's|  | |g' "${OUTPUT_SRC}"
 perl -i -0pe 's|  | |g' "${OUTPUT_SRC}"
 perl -i -0pe 's|  | |g' "${OUTPUT_SRC}"
 perl -i -0pe 's|  | |g' "${OUTPUT_SRC}"
+perl -i -0pe 's|\n *}|}|gms' "${OUTPUT_SRC}"
 
 
 

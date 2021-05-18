@@ -4,6 +4,7 @@ use game::Game;
 use std::rc::Rc;
 use std::collections::LinkedList;
 use crate::actions;
+use crate::simu;
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub enum Action {
@@ -74,16 +75,14 @@ impl game::Game<Case, linearhexagon::LinearHexagonCase<Case>, Player, linearhexa
         return actions::compute_actions(&self);
     }
     fn score(&self) -> i64{
-        // TODO
-        return 0;
+        return self.me.score as i64;
     }
     fn is_terminal(&self) -> bool{
-        // TODO
-        return true;
+        eprintln!("is_terminal {:?}", self.day >= 24);
+        return self.day >= 24 ;
     }
     fn apply(&self, action: &Action) -> Rc<Self>{
-        // TODO
-        return Rc::new(self.clone());
+        return simu::simulate_turn(&Rc::new(self), action);
     }
     fn me(&self) -> &Player{
         return &self.me;
