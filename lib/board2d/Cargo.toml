@@ -1,5 +1,5 @@
 [package]
-name = "Board2D"
+name = "board2d"
 version = "0.1.0"
 authors = ["Guillaume Escande <escande.guillaume@gmail.com>"]
 edition = "2018"

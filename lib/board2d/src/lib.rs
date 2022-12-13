@@ -30,22 +30,22 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > BoardCase< T > for Case2D< T 
 pub struct Board2D< T : Eq + PartialEq + Sized + Debug + Clone > {
     pub width: usize,
     pub height: usize,
-    values: Vec<Vec<Rc<Case2D<T>>>>,
+    cases: Vec<Vec<Rc<Case2D<T>>>>,
 }
 
 impl< T : Eq + PartialEq + Sized + Debug + Clone > Board2D<T>{
     pub fn new(width: usize, height: usize, values: &Vec<Rc<T>>) -> Board2D<T>{
 
-        let mut column : Vec<Vec<Rc<Case2D<T>>>> = Vec::with_capacity(width);
+        let mut column : Vec<Vec<Rc<Case2D<T>>>> = Vec::with_capacity(height);
 
-        for w in 0..width{
-            let mut line : Vec<Rc<Case2D<T>>> = Vec::with_capacity(height);
+        for h in 0..height{
+            let mut line : Vec<Rc<Case2D<T>>> = Vec::with_capacity(width);
             
-            for h in 0..height{
+            for w in 0..width{
                 line.push(Rc::new(Case2D::<T>{
                     x: w as i16,
                     y: h as i16,
-                    value: Rc::clone(&values[w*height + h])
+                    value: Rc::clone(&values[h*width + w])
                 }));
             }
             column.push(line);
@@ -54,7 +54,7 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > Board2D<T>{
         let result = Board2D::<T>{
             width: width,
             height: height,
-            values: column
+            cases: column
         };
         return result;
     }
@@ -67,19 +67,19 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > Board< T, Case2D<T> > for Boa
         let y = origin.position()[1] as usize;
         // Left
         if x > 0 {
-            neighbors.push(Rc::clone(&self.values[x-1][y]));
+            neighbors.push(Rc::clone(&self.cases[x-1][y]));
         }
         // Right
         if x < self.width - 1 {
-            neighbors.push(Rc::clone(&self.values[x+1][y]));
+            neighbors.push(Rc::clone(&self.cases[x+1][y]));
         }
         // Top
         if y > 0 {
-            neighbors.push(Rc::clone(&self.values[x][y-1]));
+            neighbors.push(Rc::clone(&self.cases[x][y-1]));
         }
         // Bottom
         if y < self.height - 1 {
-            neighbors.push(Rc::clone(&self.values[x][y+1]));
+            neighbors.push(Rc::clone(&self.cases[x][y+1]));
         }
 
 
@@ -96,13 +96,16 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > Board< T, Case2D<T> > for Boa
     }
 
     fn get(&self, pos: &Vec<i16>)->&Rc<Case2D<T>>{
-        return &self.values[pos[0] as usize][pos[1] as usize];
+        return &self.cases[pos[0] as usize][pos[1] as usize];
     }
 
     fn get_mut(&mut self, pos: &Vec<i16>)->&mut Rc<Case2D<T>>{
-        return &mut self.values[pos[0] as usize][pos[1] as usize];
+        return &mut self.cases[pos[0] as usize][pos[1] as usize];
     }
 
     fn print(&self){
+    }
+    fn iter(&self) -> Iterator<Item=&Rc<C>>{
+
     }
 }
