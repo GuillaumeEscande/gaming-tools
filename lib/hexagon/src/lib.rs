@@ -33,6 +33,7 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > BoardCase< T > for HexagonCas
 pub struct Hexagon< T : Eq + PartialEq + Sized + Debug + Clone > {
     size: usize,
     board : Vec< Vec< Vec< Rc< HexagonCase< T > > > > >,
+    linear : Vec<Rc< HexagonCase< T > > >,
     _phantom_t: PhantomData<T>,
 }
 
@@ -40,6 +41,7 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > Hexagon< T >{
     pub fn new(size : usize, default: &T) -> Hexagon<T>{
 
         let mut board = Vec::with_capacity(size);
+        let mut linear = Vec::new();
         let real_size = 1 + size * 2;
 
         for c1 in 0..real_size{
@@ -53,12 +55,14 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > Hexagon< T >{
                         line3 : c3 as i16 - size as i16,
                         value: Rc::new(default.clone()),
                     });
+                    linear.push(Rc::clone(&case));
                     board[c1][c2].push(case);
                 }
             }
         }
         let result = Hexagon::<T>{
             board: board,
+            linear: linear,
             size: size,
             _phantom_t: PhantomData
         };
@@ -126,35 +130,9 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone> Board< T, HexagonCase< T > > f
         return &mut self.board[pos1][pos2][pos3];
     }
     fn print(&self){
-        /*
-        let real_size = (1 + self.size * 2) as i16;
-
-        let isize : i16 = self.size as i16;
-
-        println!("Hexagon :");
-        for q in 0..real_size{
-            print!("|");
-            for r in 0..real_size{
-                if r > q && r < real_size - 1 - q {
-                    let x = q;
-                    let z = r;
-                    let y = (-1 * x) - z;
-
-                    //print!("{:?} {} {} {}",self.size, x, y, z );
-                    let xu = (x + self.size as i16) as usize;
-                    let yu = (y + self.size as i16) as usize;
-                    let zu = (z + self.size as i16) as usize;
-
-                    //let value = &self.board[xu][yu][zu];
-                    print!("O");
-                } else {
-                    print!(" ")
-                }
-            }
-            print!("|");
-            println!("");
-        }
-        */
+    }
+    fn to_linear(&self)->&Vec<Rc<HexagonCase<T>>>{
+        return &self.linear;
     }
 }
 

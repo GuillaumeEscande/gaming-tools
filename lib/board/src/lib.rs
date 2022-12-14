@@ -16,6 +16,7 @@ pub trait Board< T : Eq + PartialEq + Sized + Debug ,  C : BoardCase<T> > : Debu
     fn get_mut(&mut self, pos: &Vec<i16>)->&mut Rc<C>;
     fn size(&self) -> Vec<usize>;
     fn print(&self);
+    fn to_linear(&self)->&Vec<Rc<C>>;
 }
 
 

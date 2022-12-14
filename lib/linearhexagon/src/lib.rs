@@ -6,13 +6,13 @@ use std::rc::Rc;
 
 #[derive(Debug, Eq, PartialEq, Clone)]
 pub struct LinearHexagonCase< T : Eq + PartialEq + Sized + Debug + Clone > {
-    id : i16,
+    id : usize,
     value : Rc<T>,
 }
 
 impl< T : Eq + PartialEq + Sized + Debug + Clone > BoardCase< T > for LinearHexagonCase< T > {
     fn position(&self)->Vec<i16>{
-        return vec!(self.id);
+        return vec!(self.id as i16);
     }
     fn get_value(&self)->&Rc<T>{
         return &self.value;
@@ -40,7 +40,7 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > LinearHexagon<T>{
 
         for i in 0..size{
             values_case.push(Rc::new(LinearHexagonCase::<T>{
-                id: i as i16,
+                id: i ,
                 value: Rc::clone(&values[i])
             }));
         }
@@ -128,5 +128,8 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > Board< T, LinearHexagonCase<T
     }
 
     fn print(&self){
+    }
+    fn to_linear(&self)->&Vec<Rc<LinearHexagonCase<T>>>{
+        return &self.values;
     }
 }

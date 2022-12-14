@@ -3,7 +3,7 @@ all: test merge
 
 test: libs src
 
-libs: board board2d game linearhexagon hexagon solver graph gamio logger state 
+libs: board board2d game linearhexagon hexagon solver graph logger state 
 
 board: 
 	cd lib/board && \
@@ -33,10 +33,6 @@ graph:
 	cd lib/graph && \
 	cargo test
 
-gamio: 
-	cd lib/gamio && \
-	cargo test
-
 logger: 
 	cd lib/logger && \
 	cargo test
@@ -45,7 +41,7 @@ state:
 	cd lib/state && \
 	cargo test
 
-src: ch_spring_2021_simu
+src: ch_winter_2022
 
 ch_spring_2021:
 	cd src/ch_spring_2021 && \
@@ -63,7 +59,7 @@ merge: merge_ch_winter_2022
 
 merge_ch_spring_2021:
 	mkdir -p target
-	./tools/merger.sh -l board -l graph -l gamio -l logger -l state -o ./target ch_spring_2021
+	./tools/merger.sh -l board -l graph -l logger -l state -o ./target ch_spring_2021
 	cd target && \
 	cargo test
 
@@ -75,7 +71,7 @@ merge_ch_spring_2021_simu:
 
 merge_ch_winter_2022: ch_winter_2022
 	mkdir -p target
-	./tools/merger.sh -l board -l board2d -l graph -l gamio -l logger -l state -o ./target ch_winter_2022
+	./tools/merger.sh -l board -l board2d -l graph -l logger -o ./target ch_winter_2022
 	cd target && \
 	cargo test
 	

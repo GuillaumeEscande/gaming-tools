@@ -126,4 +126,5 @@ authors = ["Guillaume Escande <escande.guillaume@gmail.com>"]
 edition = "2018"
 
 [dependencies]
+rand = "0.8.5"
 EOF
