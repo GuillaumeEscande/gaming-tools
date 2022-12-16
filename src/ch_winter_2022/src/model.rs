@@ -1,4 +1,8 @@
 
+use std::rc::Rc;
+use board2d::Board2D;
+use logger;
+
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub enum Action {
     MOVE(i16, i16, i16, i16, i16),
@@ -8,8 +12,9 @@ pub enum Action {
     MESSAGE(String),
 }
 
-#[derive(Eq,PartialEq,Debug,Clone,Hash)]
+#[derive(Eq,PartialEq,Debug,Clone,Hash,Copy)]
 pub enum CaseType {
+    GRASS(),
     RECYCLER(),
     EMPTY(),
     ROBOT(i16)
@@ -32,6 +37,11 @@ impl Action {
 pub struct Actions {
     pub actions: Vec<Action>,
 }
+impl Actions {
+    pub fn print(&self) {
+        logger::output(self.actions.iter().map(|i| i.to_string()).collect::<Vec<_>>().join(";"));
+    }
+}
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub struct Case {
@@ -53,23 +63,8 @@ pub struct Player {
 
 pub const NEUTRAL : Player = Player{id: -1, matter: 0};
 
-#[derive(Eq,PartialEq,Debug,Clone,Hash)]
-pub struct Game {
-    pub turn: i16,
-    pub me: Player,
-    pub opp: Player
-}
+
 
 #[derive(Eq,PartialEq,Debug,Clone,Hash)]
 pub struct Params {
-}
-
-impl Game{
-    pub fn print(&self){
-        eprintln!("Turn : {}", self.turn);
-        eprintln!("Me : ");
-        eprintln!("  matter : {}", self.me.matter);
-        eprintln!("Opp : ");
-        eprintln!("  matter : {}", self.me.matter);
-    }
 }

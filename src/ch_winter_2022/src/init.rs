@@ -1,5 +1,6 @@
 use std::io;
 use crate::model;
+use crate::game_impl;
 use std::rc::Rc;
 
 #[warn(unused_macros)]
@@ -19,7 +20,7 @@ pub fn init_size() -> (usize, usize) {
 
 }
 
-pub fn init_game(size : (usize, usize), previous_turn: i16) -> (model::Game, board2d::Board2D::<model::Case>) {
+pub fn init_game(size : (usize, usize), previous_turn: i16) -> game_impl::GameImpl {
 
     let width = size.0;
     let height = size.1;
@@ -48,7 +49,10 @@ pub fn init_game(size : (usize, usize), previous_turn: i16) -> (model::Game, boa
             let can_spawn = parse_input!(inputs[5], i32);
             let in_range_of_recycler = parse_input!(inputs[6], i16);
 
-            let mut case_type = model::CaseType::EMPTY();
+            let mut case_type = model::CaseType::GRASS();
+            if owner >= 0 {
+                case_type = model::CaseType::EMPTY();
+            }
             if recycler > 0 {
                 case_type = model::CaseType::RECYCLER();
             }
@@ -77,13 +81,14 @@ pub fn init_game(size : (usize, usize), previous_turn: i16) -> (model::Game, boa
     );
 
 
-    let game : model::Game = model::Game{
+    let game : game_impl::GameImpl = game_impl::GameImpl{
+        board: board,
         turn: previous_turn + 1,
         me: me,
         opp: opp
     };
 
-    return (game, board);
+    return game;
 
 
 }

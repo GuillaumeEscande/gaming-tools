@@ -90,9 +90,9 @@ impl <  T : Eq + PartialEq + Sized + Clone + Debug,
     fn next_states(&self)->LinkedList< Rc<Self> >{
         let mut states = LinkedList::< Rc::<Self> >::new();
         if ! &self.game.is_terminal() {
-            for action in self.game.actions(){
+            for action in self.game.list_actions(){
                 states.push_back(Rc::new(GameSolvable {
-                    game: self.game.apply(&action),
+                    game: self.game.apply_action(&action),
                     _phantom_t: PhantomData,
                     _phantom_p: PhantomData,
                     _phantom_b: PhantomData,

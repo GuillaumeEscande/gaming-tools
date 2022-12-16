@@ -71,7 +71,7 @@ merge_ch_spring_2021_simu:
 
 merge_ch_winter_2022: ch_winter_2022
 	mkdir -p target
-	./tools/merger.sh -l board -l board2d -l graph -l logger -o ./target ch_winter_2022
+	./tools/merger.sh -l board -l board2d -l game -l logger -o ./target ch_winter_2022
 	cd target && \
 	cargo test
 	
