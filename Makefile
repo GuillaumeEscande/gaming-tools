@@ -55,7 +55,11 @@ ch_winter_2022:
 	cd src/ch_winter_2022 && \
 	cargo test
 
-merge: merge_ch_winter_2022
+ch_spring_2023:
+	cd src/ch_spring_2023 && \
+	cargo test
+
+merge: merge_ch_spring_2023
 
 merge_ch_spring_2021:
 	mkdir -p target
@@ -72,6 +76,12 @@ merge_ch_spring_2021_simu:
 merge_ch_winter_2022: ch_winter_2022
 	mkdir -p target
 	./tools/merger.sh -l board -l board2d -l game -l logger -o ./target ch_winter_2022
+	cd target && \
+	cargo test
+
+merge_ch_spring_2023: ch_spring_2023
+	mkdir -p target
+	./tools/merger.sh -l board -l game -l logger -l linearhexagon -o ./target ch_spring_2023
 	cd target && \
 	cargo test
 	

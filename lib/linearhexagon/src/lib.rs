@@ -4,7 +4,7 @@ use std::vec::Vec;
 use std::fmt::Debug;
 use std::rc::Rc;
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct LinearHexagonCase< T : Eq + PartialEq + Sized + Debug + Clone > {
     id : usize,
     value : Rc<T>,
@@ -22,7 +22,7 @@ impl< T : Eq + PartialEq + Sized + Debug + Clone > BoardCase< T > for LinearHexa
     }
 }
 
-#[derive(Debug, Eq, PartialEq, Clone)]
+#[derive(Debug, Eq, PartialEq, Clone, Hash)]
 pub struct LinearHexagon< T : Eq + PartialEq + Sized + Debug + Clone > {
     pub size: usize,
     values: Vec<Rc<LinearHexagonCase<T>>>,
